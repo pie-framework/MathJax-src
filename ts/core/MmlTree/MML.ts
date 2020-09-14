@@ -21,46 +21,57 @@
  * @author dpvc@mathjax.org (Davide Cervone)
  */
 
-import {MmlNodeClass, TextNode, XMLNode} from './MmlNode.js';
+import { MmlNodeClass, TextNode, XMLNode } from "./MmlNode.js";
 
-import {MmlMath}      from './MmlNodes/math.js';
+import { MmlMath } from "./MmlNodes/math.js";
 
-import {MmlMi}        from './MmlNodes/mi.js';
-import {MmlMn}        from './MmlNodes/mn.js';
-import {MmlMo}        from './MmlNodes/mo.js';
-import {MmlMtext}     from './MmlNodes/mtext.js';
-import {MmlMspace}    from './MmlNodes/mspace.js';
-import {MmlMs}        from './MmlNodes/ms.js';
+import { MmlMi } from "./MmlNodes/mi.js";
+import { MmlMn } from "./MmlNodes/mn.js";
+import { MmlMo } from "./MmlNodes/mo.js";
+import { MmlMtext } from "./MmlNodes/mtext.js";
+import { MmlMspace } from "./MmlNodes/mspace.js";
+import { MmlMs } from "./MmlNodes/ms.js";
 
-import {MmlMrow, MmlInferredMrow} from './MmlNodes/mrow.js';
-import {MmlMfrac}     from './MmlNodes/mfrac.js';
-import {MmlMsqrt}     from './MmlNodes/msqrt.js';
-import {MmlMroot}     from './MmlNodes/mroot.js';
-import {MmlMstyle}    from './MmlNodes/mstyle.js';
-import {MmlMerror}    from './MmlNodes/merror.js';
-import {MmlMpadded}   from './MmlNodes/mpadded.js';
-import {MmlMphantom}  from './MmlNodes/mphantom.js';
-import {MmlMfenced}   from './MmlNodes/mfenced.js';
-import {MmlMenclose}  from './MmlNodes/menclose.js';
+import { MmlMrow, MmlInferredMrow } from "./MmlNodes/mrow.js";
+import { MmlMfrac } from "./MmlNodes/mfrac.js";
+import { MmlMsqrt } from "./MmlNodes/msqrt.js";
+import { MmlMroot } from "./MmlNodes/mroot.js";
+import { MmlMstyle } from "./MmlNodes/mstyle.js";
+import { MmlMerror } from "./MmlNodes/merror.js";
+import { MmlMpadded } from "./MmlNodes/mpadded.js";
+import { MmlMphantom } from "./MmlNodes/mphantom.js";
+import { MmlMfenced } from "./MmlNodes/mfenced.js";
+import { MmlMenclose } from "./MmlNodes/menclose.js";
 
-import {MmlMaction}   from './MmlNodes/maction.js';
+import { MmlMaction } from "./MmlNodes/maction.js";
 
-import {MmlMsubsup, MmlMsub, MmlMsup}       from './MmlNodes/msubsup.js';
-import {MmlMunderover, MmlMunder, MmlMover} from './MmlNodes/munderover.js';
-import {MmlMmultiscripts, MmlMprescripts, MmlNone} from './MmlNodes/mmultiscripts.js';
+import { MmlMsubsup, MmlMsub, MmlMsup } from "./MmlNodes/msubsup.js";
+import { MmlMunderover, MmlMunder, MmlMover } from "./MmlNodes/munderover.js";
+import {
+  MmlMmultiscripts,
+  MmlMprescripts,
+  MmlNone,
+} from "./MmlNodes/mmultiscripts.js";
 
-import {MmlMtable}      from './MmlNodes/mtable.js';
-import {MmlMtr, MmlMlabeledtr} from './MmlNodes/mtr.js';
-import {MmlMtd}         from './MmlNodes/mtd.js';
-import {MmlMaligngroup} from './MmlNodes/maligngroup.js';
-import {MmlMalignmark}  from './MmlNodes/malignmark.js';
+import { MmlMtable } from "./MmlNodes/mtable.js";
+import { MmlMtr, MmlMlabeledtr } from "./MmlNodes/mtr.js";
+import { MmlMtd } from "./MmlNodes/mtd.js";
+import { MmlMaligngroup } from "./MmlNodes/maligngroup.js";
+import { MmlMalignmark } from "./MmlNodes/malignmark.js";
 
-import {MmlMglyph}      from './MmlNodes/mglyph.js';
+import { MmlMglyph } from "./MmlNodes/mglyph.js";
 
-import {MmlSemantics, MmlAnnotation, MmlAnnotationXML} from './MmlNodes/semantics.js';
+import {
+  MmlSemantics,
+  MmlAnnotation,
+  MmlAnnotationXML,
+} from "./MmlNodes/semantics.js";
 
-import {TeXAtom} from './MmlNodes/TeXAtom.js';
-import {MathChoice} from './MmlNodes/mathchoice.js';
+import { TeXAtom } from "./MmlNodes/TeXAtom.js";
+import { MathChoice } from "./MmlNodes/mathchoice.js";
+import { MmlMstack } from "./MmlNodes/mstack.js";
+import { MmlMsrow } from "./MmlNodes/msrow.js";
+import { MmlMsline } from "./MmlNodes/msline.js";
 
 /************************************************************************/
 /**
@@ -69,8 +80,10 @@ import {MathChoice} from './MmlNodes/mathchoice.js';
  *  object to override existing classes with subclasses, or to add new
  *  classes as necessary.
  */
-
-export let MML: {[kind: string]: MmlNodeClass} = {
+export let MML: { [kind: string]: MmlNodeClass } = {
+  [MmlMstack.prototype.kind]: MmlMstack,
+  [MmlMsrow.prototype.kind]: MmlMsrow,
+  [MmlMsline.prototype.kind]: MmlMsline,
   [MmlMath.prototype.kind]: MmlMath,
 
   [MmlMi.prototype.kind]: MmlMi,
@@ -121,5 +134,5 @@ export let MML: {[kind: string]: MmlNodeClass} = {
   [MathChoice.prototype.kind]: MathChoice,
 
   [TextNode.prototype.kind]: TextNode,
-  [XMLNode.prototype.kind]: XMLNode
+  [XMLNode.prototype.kind]: XMLNode,
 };
