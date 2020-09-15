@@ -9708,6 +9708,9 @@ function BitFieldClass(...names) {
 
 
 
+
+
+
 /**
  * Implements a prioritized list of render actions.  Extensions can add actions to the list
  *   to make it easy to extend the normal typesetting and conversion operations.
@@ -9717,14 +9720,15 @@ function BitFieldClass(...names) {
  * @template D  The Document class
  */
 class RenderList extends PrioritizedList {
-
   /**
    * Creates a new RenderList from an initial list of rendering actions
    *
    * @param {RenderActions} actions The list of actions to take during render(), rerender(), and convert() calls
    * @returns {RenderList}    The newly created prioritied list
    */
-   static create(actions) {
+   static create(
+    actions
+  ) {
     const list = new this();
     for (const id of Object.keys(actions)) {
       const [action, priority] = this.action(id, actions[id]);
@@ -9743,7 +9747,10 @@ class RenderList extends PrioritizedList {
    * @param {RenderAction} action     The RenderAction defining the action
    * @returns {[RenderData,number]}   The corresponding RenderData definition for the action and its priority
    */
-   static action(id, action) {
+   static action(
+    id,
+    action
+  ) {
     let renderDoc, renderMath;
     let convert = true;
     let priority = action[0];
@@ -9761,9 +9768,15 @@ class RenderList extends PrioritizedList {
       }
     } else {
       action.length === 4 && (convert = action[3] );
-      [renderDoc, renderMath] = action.slice(1) ;
+      [renderDoc, renderMath] = action.slice(1) 
+
+
+;
     }
-    return [{id, renderDoc, renderMath, convert} , priority];
+    return [
+      { id, renderDoc, renderMath, convert } ,
+      priority,
+    ];
   }
 
   /**
@@ -9775,8 +9788,14 @@ class RenderList extends PrioritizedList {
    */
    static methodActions(method1, method2 = method1) {
     return [
-      (document) => {method1 && document[method1](); return false; },
-      (math, document) => {method2 && math[method2](document); return false; }
+      (document) => {
+        method1 && document[method1]();
+        return false;
+      },
+      (math, document) => {
+        method2 && math[method2](document);
+        return false;
+      },
     ];
   }
 
@@ -9786,7 +9805,10 @@ class RenderList extends PrioritizedList {
    * @param {MathDocument} document   The MathDocument whose methods are to be called
    * @param {number=} start           The state at which to start rendering (default is UNPROCESSED)
    */
-   renderDoc(document, start = STATE.UNPROCESSED) {
+   renderDoc(
+    document,
+    start = STATE.UNPROCESSED
+  ) {
     for (const item of this.items) {
       if (item.priority >= start) {
         if (item.item.renderDoc(document)) return;
@@ -9801,7 +9823,11 @@ class RenderList extends PrioritizedList {
    * @param {MathDocument} document   The MathDocument to pass to the MathItem methods
    * @param {number=} start           The state at which to start rendering (default is UNPROCESSED)
    */
-   renderMath(math, document, start = STATE.UNPROCESSED) {
+   renderMath(
+    math,
+    document,
+    start = STATE.UNPROCESSED
+  ) {
     for (const item of this.items) {
       if (item.priority >= start) {
         if (item.item.renderMath(math, document)) return;
@@ -9816,7 +9842,11 @@ class RenderList extends PrioritizedList {
    * @param {MathDocument} document   The MathDocument to pass to the MathItem methods
    * @param {number=} end             The state at which to end rendering (default is LAST)
    */
-   renderConvert(math, document, end = STATE.LAST) {
+   renderConvert(
+    math,
+    document,
+    end = STATE.LAST
+  ) {
     for (const item of this.items) {
       if (item.priority > end) return;
       if (item.item.convert) {
@@ -9839,7 +9869,6 @@ class RenderList extends PrioritizedList {
     }
     return null;
   }
-
 }
 
 /*****************************************************************/
@@ -9849,7 +9878,6 @@ class RenderList extends PrioritizedList {
  *
  * @template N  The HTMLElement node class
  */
-
 
 
 
@@ -10098,7 +10126,10 @@ class DefaultOutputJax extends AbstractOutputJax {
   /**
    * @override
    */
-   typeset(_math, _document = null) {
+   typeset(
+    _math,
+    _document = null
+  ) {
     return null ;
   }
   /**
@@ -10135,8 +10166,8 @@ class DefaultMathItem extends AbstractMathItem {}
  * @template T  The Text node class
  * @template D  The Document class
  */
-class AbstractMathDocument {
-
+class AbstractMathDocument
+ {
   /**
    * The type of MathDocument
    */
@@ -10146,30 +10177,44 @@ class AbstractMathDocument {
    * The default options for the document
    */
    static __initStatic2() {this.OPTIONS = {
-    OutputJax: null,           // instance of an OutputJax for the document
-    InputJax: null,            // instance of an InputJax or an array of them
-    MmlFactory: null,          // instance of a MmlFactory for this document
+    OutputJax: null, // instance of an OutputJax for the document
+    InputJax: null, // instance of an InputJax or an array of them
+    MmlFactory: null, // instance of a MmlFactory for this document
     MathList: DefaultMathList, // constructor for a MathList to use for the document
     MathItem: DefaultMathItem, // constructor for a MathItem to use for the MathList
-    compileError: (doc, math, err) => {
+    compileError: (
+      doc,
+      math,
+      err
+    ) => {
       doc.compileError(math, err);
     },
-    typesetError: (doc, math, err) => {
+    typesetError: (
+      doc,
+      math,
+      err
+    ) => {
       doc.typesetError(math, err);
     },
     renderActions: expandable({
-      find:    [STATE.FINDMATH, 'findMath', '', false],
+      find: [STATE.FINDMATH, 'findMath', '', false],
       compile: [STATE.COMPILED],
       metrics: [STATE.METRICS, 'getMetrics', '', false],
       typeset: [STATE.TYPESET],
-      update:  [STATE.INSERTED, 'updateDocument', false]
-    }) 
+      update: [STATE.INSERTED, 'updateDocument', false],
+    }) ,
   };}
 
   /**
    * A bit-field for the actions that have been processed
    */
-   static __initStatic3() {this.ProcessBits = BitFieldClass('findMath', 'compile', 'getMetrics', 'typeset', 'updateDocument');}
+   static __initStatic3() {this.ProcessBits = BitFieldClass(
+    'findMath',
+    'compile',
+    'getMetrics',
+    'typeset',
+    'updateDocument'
+  );}
 
   /**
    * The document managed by this MathDocument
@@ -10215,21 +10260,23 @@ class AbstractMathDocument {
    */
   
 
-
   /**
    * @param {any} document           The document (HTML string, parsed DOM, etc.) to be processed
    * @param {DOMAdaptor} adaptor     The DOM adaptor for this document
    * @param {OptionList} options     The options for this document
    * @constructor
    */
-  constructor (document, adaptor, options) {
+  constructor(document, adaptor, options) {
     let CLASS = this.constructor ;
     this.document = document;
     this.options = userOptions(defaultOptions({}, CLASS.OPTIONS), options);
     this.math = new (this.options['MathList'] || DefaultMathList)();
-    this.renderActions = RenderList.create(this.options['renderActions']);
+    this.renderActions = RenderList.create(
+      this.options['renderActions']
+    );
     this.processed = new AbstractMathDocument.ProcessBits();
-    this.outputJax = this.options['OutputJax'] || new DefaultOutputJax();
+    this.outputJax =
+      this.options['OutputJax'] || new DefaultOutputJax();
     let inputJax = this.options['InputJax'] || [new DefaultInputJax()];
     if (!Array.isArray(inputJax)) {
       inputJax = [inputJax];
@@ -10240,17 +10287,17 @@ class AbstractMathDocument {
     //
     this.adaptor = adaptor;
     this.outputJax.setAdaptor(adaptor);
-    this.inputJax.map(jax => jax.setAdaptor(adaptor));
+    this.inputJax.map((jax) => jax.setAdaptor(adaptor));
     //
     // Pass the MmlFactory to the jax
     //
     this.mmlFactory = this.options['MmlFactory'] || new MmlFactory();
-    this.inputJax.map(jax => jax.setMmlFactory(this.mmlFactory));
+    this.inputJax.map((jax) => jax.setMmlFactory(this.mmlFactory));
     //
     // Do any initialization that requires adaptors or factories
     //
     this.outputJax.initialize();
-    this.inputJax.map(jax => jax.initialize());
+    this.inputJax.map((jax) => jax.initialize());
   }
 
   /**
@@ -10264,7 +10311,10 @@ class AbstractMathDocument {
    * @override
    */
    addRenderAction(id, ...action) {
-    const [fn, p] = RenderList.action(id, action );
+    const [fn, p] = RenderList.action(
+      id,
+      action 
+    );
     this.renderActions.add(fn, p);
   }
 
@@ -10299,19 +10349,40 @@ class AbstractMathDocument {
    * @override
    */
    convert(math, options = {}) {
-    let {format, display, end, ex, em, containerWidth, lineWidth, scale} = userOptions({
-      format: this.inputJax[0].name, display: true, end: STATE.LAST,
-      em: 16, ex: 8, containerWidth: null, lineWidth: 1000000, scale: 1
-    }, options);
+    let {
+      format,
+      display,
+      end,
+      ex,
+      em,
+      containerWidth,
+      lineWidth,
+      scale,
+    } = userOptions(
+      {
+        format: this.inputJax[0].name,
+        display: true,
+        end: STATE.LAST,
+        em: 16,
+        ex: 8,
+        containerWidth: null,
+        lineWidth: 1000000,
+        scale: 1,
+      },
+      options
+    );
     if (containerWidth === null) {
       containerWidth = 80 * ex;
     }
-    const jax = this.inputJax.reduce((jax, ijax) => (ijax.name === format ? ijax : jax), null);
+    const jax = this.inputJax.reduce(
+      (jax, ijax) => (ijax.name === format ? ijax : jax),
+      null
+    );
     const mitem = new this.options.MathItem(math, jax, display);
     mitem.start.node = this.adaptor.body(this.document);
     mitem.setMetrics(em, ex, containerWidth, lineWidth, scale);
     mitem.convert(this, end);
-    return (mitem.typesetRoot || mitem.root);
+    return mitem.typesetRoot || mitem.root;
   }
 
   /**
@@ -10375,11 +10446,17 @@ class AbstractMathDocument {
    */
    compileError(math, err) {
     math.root = this.mmlFactory.create('math', null, [
-      this.mmlFactory.create('merror', {'data-mjx-error': err.message, title: err.message}, [
-        this.mmlFactory.create('mtext', null, [
-          (this.mmlFactory.create('text') ).setText('Math input error')
-        ])
-      ])
+      this.mmlFactory.create(
+        'merror',
+        { 'data-mjx-error': err.message, title: err.message },
+        [
+          this.mmlFactory.create('mtext', null, [
+            (this.mmlFactory.create('text') ).setText(
+              'Math input error'
+            ),
+          ]),
+        ]
+      ),
     ]);
     if (math.display) {
       math.root.attributes.set('display', 'block');
@@ -10415,29 +10492,36 @@ class AbstractMathDocument {
    * @param {Error} err      The Error object for the error
    */
    typesetError(math, err) {
-    math.typesetRoot = this.adaptor.node('mjx-container', {
-      class: 'MathJax mjx-output-error',
-      jax: this.outputJax.name,
-    }, [
-      this.adaptor.node('span', {
-        'data-mjx-error': err.message,
-        title: err.message,
-        style: {
-          color: 'red',
-          'background-color': 'yellow',
-          'line-height': 'normal'
-        }
-      }, [
-        this.adaptor.text('Math output error')
-      ])
-    ]);
+    console.error(err);
+    math.typesetRoot = this.adaptor.node(
+      'mjx-container',
+      {
+        class: 'MathJax mjx-output-error',
+        jax: this.outputJax.name,
+      },
+      [
+        this.adaptor.node(
+          'span',
+          {
+            'data-mjx-error': err.message,
+            title: err.message,
+            style: {
+              color: 'red',
+              'background-color': 'yellow',
+              'line-height': 'normal',
+            },
+          },
+          [this.adaptor.text('Math output error')]
+        ),
+      ]
+    );
     if (math.display) {
       this.adaptor.setAttributes(math.typesetRoot, {
         style: {
           display: 'block',
           margin: '1em 0',
-          'text-align': 'center'
-        }
+          'text-align': 'center',
+        },
       });
     }
     math.outputData.error = err.message;
@@ -10536,8 +10620,7 @@ class AbstractMathDocument {
     const adaptor = this.adaptor;
     const items = [] ;
     const containers = adaptor.getElements(elements, this.document);
-    ITEMS:
-    for (const item of this.math) {
+    ITEMS: for (const item of this.math) {
       for (const container of containers) {
         if (item.start.node && adaptor.contains(container, item.start.node)) {
           items.push(item);
@@ -10547,7 +10630,6 @@ class AbstractMathDocument {
     }
     return items;
   }
-
 } AbstractMathDocument.__initStatic(); AbstractMathDocument.__initStatic2(); AbstractMathDocument.__initStatic3();
 
 /**
@@ -11181,11 +11263,10 @@ class HTMLDomStrings {
  * @template D  The Document class
  */
 class HTMLDocument extends AbstractMathDocument {
-
   /**
    * The kind of document
    */
-   static __initStatic() {this.KIND = 'HTML';}
+   static __initStatic() {this.KIND = "HTML";}
 
   /**
    * The default options for HTMLDocument
@@ -11194,11 +11275,11 @@ class HTMLDocument extends AbstractMathDocument {
     ...AbstractMathDocument.OPTIONS,
     renderActions: expandable({
       ...AbstractMathDocument.OPTIONS.renderActions,
-      styles: [STATE.INSERTED + 1, '', 'updateStyleSheet', false]  // update styles on a rerender() call
+      styles: [STATE.INSERTED + 1, "", "updateStyleSheet", false], // update styles on a rerender() call
     }),
-    MathList: HTMLMathList,           // Use the HTMLMathList for MathLists
-    MathItem: HTMLMathItem,           // Use the HTMLMathItem for MathItem
-    DomStrings: null                  // Use the default DomString parser
+    MathList: HTMLMathList, // Use the HTMLMathList for MathLists
+    MathItem: HTMLMathItem, // Use the HTMLMathItem for MathItem
+    DomStrings: null, // Use the default DomString parser
   };}
 
   /**
@@ -11216,10 +11297,15 @@ class HTMLDocument extends AbstractMathDocument {
    * @constructor
    * @extends {AbstractMathDocument}
    */
-  constructor(document, adaptor, options) {
+  constructor(
+    document,
+    adaptor,
+    options
+  ) {
     let [html, dom] = separateOptions(options, HTMLDomStrings.OPTIONS);
     super(document, adaptor, html);
-    this.domStrings = this.options['DomStrings'] || new HTMLDomStrings(dom);
+    this.domStrings =
+      this.options["DomStrings"] || new HTMLDomStrings(dom);
     this.domStrings.adaptor = adaptor;
     this.styles = [];
   }
@@ -11235,16 +11321,21 @@ class HTMLDocument extends AbstractMathDocument {
    * @param {HTMLNodeArray} nodes  The list of node lists representing the string array
    * @return {Location}            The Location object for the position of the delimiter in the document
    */
-   findPosition(N, index, delim, nodes) {
+   findPosition(
+    N,
+    index,
+    delim,
+    nodes
+  ) {
     const adaptor = this.adaptor;
     for (const list of nodes[N]) {
       let [node, n] = list;
-      if (index <= n && adaptor.kind(node) === '#text') {
-        return {node: node, n: Math.max(index, 0), delim: delim};
+      if (index <= n && adaptor.kind(node) === "#text") {
+        return { node: node, n: Math.max(index, 0), delim: delim };
       }
       index -= n;
     }
-    return {node: null, n: 0, delim: delim};
+    return { node: null, n: 0, delim: delim };
   }
 
   /**
@@ -11256,13 +11347,22 @@ class HTMLDocument extends AbstractMathDocument {
    * @param {HTMLNodeArray} nodes  The array of node lists that produced the string array
    * @return {HTMLMathItem}        The MathItem for the given proto item
    */
-   mathItem(item, jax,
-                     nodes) {
-                       let math = item.math;
-                       let start = this.findPosition(item.n, item.start.n, item.open, nodes);
-                       let end = this.findPosition(item.n, item.end.n, item.close, nodes);
-                       return new this.options.MathItem(math, jax, item.display, start, end) ;
-                     }
+   mathItem(
+    item,
+    jax,
+    nodes
+  ) {
+    let math = item.math;
+    let start = this.findPosition(item.n, item.start.n, item.open, nodes);
+    let end = this.findPosition(item.n, item.end.n, item.close, nodes);
+    return new this.options.MathItem(
+      math,
+      jax,
+      item.display,
+      start,
+      end
+    ) ;
+  }
 
   /**
    * Find math within the document:
@@ -11282,13 +11382,21 @@ class HTMLDocument extends AbstractMathDocument {
    * @override
    */
    findMath(options) {
-    if (!this.processed.isSet('findMath')) {
+    if (!this.processed.isSet("findMath")) {
       this.adaptor.document = this.document;
-      options = userOptions({elements: this.options.elements || [this.adaptor.body(this.document)]}, options);
-      for (const container of this.adaptor.getElements(options['elements'], this.document)) {
+      options = userOptions(
+        {
+          elements: this.options.elements || [this.adaptor.body(this.document)],
+        },
+        options
+      );
+      for (const container of this.adaptor.getElements(
+        options["elements"],
+        this.document
+      )) {
         let [strings, nodes] = [null, null] ;
         for (const jax of this.inputJax) {
-          let list = new (this.options['MathList'])();
+          let list = new this.options["MathList"]();
           if (jax.processStrings) {
             if (strings === null) {
               [strings, nodes] = this.domStrings.find(container);
@@ -11298,15 +11406,22 @@ class HTMLDocument extends AbstractMathDocument {
             }
           } else {
             for (const math of jax.findMath(container)) {
-              let item =
-                new this.options.MathItem(math.math, jax, math.display, math.start, math.end);
+              console.log("math.math", math.math);
+              console.log("math.math", math);
+              let item = new this.options.MathItem(
+                math.math,
+                jax,
+                math.display,
+                math.start,
+                math.end
+              );
               list.push(item);
             }
           }
           this.math.merge(list);
         }
       }
-      this.processed.set('findMath');
+      this.processed.set("findMath");
     }
     return this;
   }
@@ -11315,11 +11430,11 @@ class HTMLDocument extends AbstractMathDocument {
    * @override
    */
    updateDocument() {
-    if (!this.processed.isSet('updateDocument')) {
+    if (!this.processed.isSet("updateDocument")) {
       this.addPageElements();
       this.addStyleSheet();
       super.updateDocument();
-      this.processed.set('updateDocument');
+      this.processed.set("updateDocument");
     }
     return this;
   }
@@ -11342,7 +11457,7 @@ class HTMLDocument extends AbstractMathDocument {
     const sheet = this.documentStyleSheet();
     if (sheet) {
       const head = this.adaptor.head(this.document);
-      let styles = this.findSheet(head, this.adaptor.getAttribute(sheet, 'id'));
+      let styles = this.findSheet(head, this.adaptor.getAttribute(sheet, "id"));
       if (styles) {
         this.adaptor.replace(sheet, styles);
       } else {
@@ -11358,8 +11473,8 @@ class HTMLDocument extends AbstractMathDocument {
    */
    findSheet(head, id) {
     if (id) {
-      for (const sheet of this.adaptor.tags(head, 'style')) {
-        if (this.adaptor.getAttribute(sheet, 'id') === id) {
+      for (const sheet of this.adaptor.tags(head, "style")) {
+        if (this.adaptor.getAttribute(sheet, "id") === id) {
           return sheet;
         }
       }
@@ -11371,14 +11486,14 @@ class HTMLDocument extends AbstractMathDocument {
    * @override
    */
    removeFromDocument(restore = false) {
-    if (this.processed.isSet('updateDocument')) {
+    if (this.processed.isSet("updateDocument")) {
       for (const math of this.math) {
         if (math.state() >= STATE.INSERTED) {
           math.state(STATE.TYPESET, restore);
         }
       }
     }
-    this.processed.clear('updateDocument');
+    this.processed.clear("updateDocument");
     return this;
   }
 
@@ -11411,7 +11526,6 @@ class HTMLDocument extends AbstractMathDocument {
    getStyles() {
     return this.styles;
   }
-
 } HTMLDocument.__initStatic(); HTMLDocument.__initStatic2();
 
 /*************************************************************
@@ -23727,9 +23841,11 @@ function CommonMtableMixin
  * @template T  The Text node class
  * @template D  The Document class
  */
-class CHTMLmtable extends
-CommonMtableMixin(CHTMLWrapper) {
+class CHTMLmtable extends CommonMtableMixin
 
+
+
+(CHTMLWrapper) {
   /**
    * The mtable wrapper
    */
@@ -23739,60 +23855,60 @@ CommonMtableMixin(CHTMLWrapper) {
    * @override
    */
    static __initStatic2() {this.styles = {
-    'mjx-mtable': {
-      'vertical-align': '.25em',
-      'text-align': 'center',
-      'position': 'relative',
-      'box-sizing': 'border-box'
+    "mjx-mtable": {
+      "vertical-align": ".25em",
+      "text-align": "center",
+      position: "relative",
+      "box-sizing": "border-box",
     },
-    'mjx-labels': {
-      position: 'absolute',
+    "mjx-labels": {
+      position: "absolute",
       left: 0,
-      top: 0
+      top: 0,
     },
-    'mjx-table': {
-      'display': 'inline-block',
-      'vertical-align': '-.5ex'
+    "mjx-table": {
+      display: "inline-block",
+      "vertical-align": "-.5ex",
     },
-    'mjx-table > mjx-itable': {
-      'vertical-align': 'middle',
-      'text-align': 'left',
-      'box-sizing': 'border-box'
+    "mjx-table > mjx-itable": {
+      "vertical-align": "middle",
+      "text-align": "left",
+      "box-sizing": "border-box",
     },
-    'mjx-labels > mjx-itable': {
-      position: 'absolute',
-      top: 0
+    "mjx-labels > mjx-itable": {
+      position: "absolute",
+      top: 0,
     },
     'mjx-mtable[justify="left"]': {
-      'text-align': 'left'
+      "text-align": "left",
     },
     'mjx-mtable[justify="right"]': {
-      'text-align': 'right'
+      "text-align": "right",
     },
     'mjx-mtable[justify="left"][side="left"]': {
-      'padding-right': '0 ! important'
+      "padding-right": "0 ! important",
     },
     'mjx-mtable[justify="left"][side="right"]': {
-      'padding-left': '0 ! important'
+      "padding-left": "0 ! important",
     },
     'mjx-mtable[justify="right"][side="left"]': {
-      'padding-right': '0 ! important'
+      "padding-right": "0 ! important",
     },
     'mjx-mtable[justify="right"][side="right"]': {
-      'padding-left': '0 ! important'
+      "padding-left": "0 ! important",
     },
-    'mjx-mtable[align]': {
-      'vertical-align': 'baseline'
+    "mjx-mtable[align]": {
+      "vertical-align": "baseline",
     },
     'mjx-mtable[align="top"] > mjx-table': {
-      'vertical-align': 'top'
+      "vertical-align": "top",
     },
     'mjx-mtable[align="bottom"] > mjx-table': {
-      'vertical-align': 'bottom'
+      "vertical-align": "bottom",
     },
     'mjx-mtable[side="right"] mjx-labels': {
-      'min-width': '100%'
-    }
+      "min-width": "100%",
+    },
   };}
 
   /**
@@ -23810,10 +23926,14 @@ CommonMtableMixin(CHTMLWrapper) {
   /**
    * @override
    */
-  constructor(factory, node, parent = null) {
+  constructor(
+    factory,
+    node,
+    parent = null
+  ) {
     super(factory, node, parent);
-    this.itable = this.html('mjx-itable');
-    this.labels = this.html('mjx-itable');
+    this.itable = this.html("mjx-itable");
+    this.labels = this.html("mjx-itable");
   }
 
   /**
@@ -23835,7 +23955,7 @@ CommonMtableMixin(CHTMLWrapper) {
     //  Create the rows inside an mjx-itable (which will be used to center the table on the math axis)
     //
     const chtml = this.standardCHTMLnode(parent);
-    this.adaptor.append(chtml, this.html('mjx-table', {}, [this.itable]));
+    this.adaptor.append(chtml, this.html("mjx-table", {}, [this.itable]));
     for (const child of this.childNodes) {
       child.toCHTML(this.itable);
     }
@@ -23865,10 +23985,10 @@ CommonMtableMixin(CHTMLWrapper) {
    */
    shiftColor() {
     const adaptor = this.adaptor;
-    const color = adaptor.getStyle(this.chtml, 'backgroundColor');
+    const color = adaptor.getStyle(this.chtml, "backgroundColor");
     if (color) {
-      adaptor.setStyle(this.chtml, 'backgroundColor', '');
-      adaptor.setStyle(this.itable, 'backgroundColor', color);
+      adaptor.setStyle(this.chtml, "backgroundColor", "");
+      adaptor.setStyle(this.itable, "backgroundColor", color);
     }
   }
 
@@ -23881,7 +24001,7 @@ CommonMtableMixin(CHTMLWrapper) {
     const adaptor = this.adaptor;
     for (const row of adaptor.childNodes(this.itable) ) {
       while (adaptor.childNodes(row).length < this.numCols) {
-        adaptor.append(row, this.html('mjx-mtd'));
+        adaptor.append(row, this.html("mjx-mtd"));
       }
     }
   }
@@ -23913,12 +24033,17 @@ CommonMtableMixin(CHTMLWrapper) {
         //  Set the style for the spacing, if it is needed, and isn't the
         //  default already set in the mtd styles
         //
-        const styleNode = (cell ? cell.chtml : this.adaptor.childNodes(row.chtml)[i] );
-        if ((i > 1 && lspace !== '0.4em') || (frame && i === 1)) {
-          this.adaptor.setStyle(styleNode, 'paddingLeft', lspace);
+        const styleNode = cell
+          ? cell.chtml
+          : (this.adaptor.childNodes(row.chtml)[i] );
+        if ((i > 1 && lspace !== "0.4em") || (frame && i === 1)) {
+          this.adaptor.setStyle(styleNode, "paddingLeft", lspace);
         }
-        if ((i < this.numCols && rspace !== '0.4em') || (frame && i === this.numCols)) {
-          this.adaptor.setStyle(styleNode, 'paddingRight', rspace);
+        if (
+          (i < this.numCols && rspace !== "0.4em") ||
+          (frame && i === this.numCols)
+        ) {
+          this.adaptor.setStyle(styleNode, "paddingRight", rspace);
         }
       }
     }
@@ -23928,14 +24053,14 @@ CommonMtableMixin(CHTMLWrapper) {
    * Add borders to the left of cells to make the column lines
    */
    handleColumnLines() {
-    if (this.node.attributes.get('columnlines') === 'none') return;
-    const lines = this.getColumnAttributes('columnlines');
+    if (this.node.attributes.get("columnlines") === "none") return;
+    const lines = this.getColumnAttributes("columnlines");
     for (const row of this.childNodes) {
       let i = 0;
       for (const cell of this.adaptor.childNodes(row.chtml).slice(1) ) {
         const line = lines[i++];
-        if (line === 'none') continue;
-        this.adaptor.setStyle(cell, 'borderLeft', '.07em ' + line);
+        if (line === "none") continue;
+        this.adaptor.setStyle(cell, "borderLeft", ".07em " + line);
       }
     }
   }
@@ -23949,10 +24074,10 @@ CommonMtableMixin(CHTMLWrapper) {
       for (const cell of this.adaptor.childNodes(row.chtml) ) {
         const w = this.cWidths[i++];
         if (w !== null) {
-          const width = (typeof w === 'number' ? this.em(w) : w);
-          this.adaptor.setStyle(cell, 'width', width);
-          this.adaptor.setStyle(cell, 'maxWidth', width);
-          this.adaptor.setStyle(cell, 'minWidth', width);
+          const width = typeof w === "number" ? this.em(w) : w;
+          this.adaptor.setStyle(cell, "width", width);
+          this.adaptor.setStyle(cell, "maxWidth", width);
+          this.adaptor.setStyle(cell, "minWidth", width);
         }
       }
     }
@@ -23985,11 +24110,14 @@ CommonMtableMixin(CHTMLWrapper) {
         //  Set the style for the spacing, if it is needed, and isn't the
         //  default already set in the mtd styles
         //
-        if ((i > 1 && tspace !== '0.215em') || (frame && i === 1)) {
-          this.adaptor.setStyle(cell.chtml, 'paddingTop', tspace);
+        if ((i > 1 && tspace !== "0.215em") || (frame && i === 1)) {
+          this.adaptor.setStyle(cell.chtml, "paddingTop", tspace);
         }
-        if ((i < this.numRows && bspace !== '0.215em') || (frame && i === this.numRows)) {
-          this.adaptor.setStyle(cell.chtml, 'paddingBottom', bspace);
+        if (
+          (i < this.numRows && bspace !== "0.215em") ||
+          (frame && i === this.numRows)
+        ) {
+          this.adaptor.setStyle(cell.chtml, "paddingBottom", bspace);
         }
       }
     }
@@ -23999,14 +24127,14 @@ CommonMtableMixin(CHTMLWrapper) {
    * Add borders to the tops of cells to make the row lines
    */
    handleRowLines() {
-    if (this.node.attributes.get('rowlines') === 'none') return;
-    const lines = this.getRowAttributes('rowlines');
+    if (this.node.attributes.get("rowlines") === "none") return;
+    const lines = this.getRowAttributes("rowlines");
     let i = 0;
     for (const row of this.childNodes.slice(1)) {
       const line = lines[i++];
-      if (line === 'none') continue;
+      if (line === "none") continue;
       for (const cell of this.adaptor.childNodes(row.chtml) ) {
-        this.adaptor.setStyle(cell, 'borderTop', '.07em ' + line);
+        this.adaptor.setStyle(cell, "borderTop", ".07em " + line);
       }
     }
   }
@@ -24016,9 +24144,9 @@ CommonMtableMixin(CHTMLWrapper) {
    * baseline or axis rows within the newly sized
    */
    handleEqualRows() {
-    if (!this.node.attributes.get('equalrows')) return;
+    if (!this.node.attributes.get("equalrows")) return;
     const space = this.getRowHalfSpacing();
-    const {H, D, NH, ND} = this.getTableData();
+    const { H, D, NH, ND } = this.getTableData();
     const HD = this.getEqualRowHeight();
     //
     // Loop through the rows and set their heights
@@ -24026,7 +24154,12 @@ CommonMtableMixin(CHTMLWrapper) {
     for (let i = 0; i < this.numRows; i++) {
       const row = this.childNodes[i];
       if (HD !== NH[i] + ND[i]) {
-        this.setRowHeight(row, HD, (HD - H[i] + D[i]) / 2, space[i] + space[i + 1]);
+        this.setRowHeight(
+          row,
+          HD,
+          (HD - H[i] + D[i]) / 2,
+          space[i] + space[i + 1]
+        );
       }
     }
   }
@@ -24040,9 +24173,14 @@ CommonMtableMixin(CHTMLWrapper) {
    * @param {number] D           The new depth for the row
    * @param {number} space       The total spacing above and below the row
    */
-   setRowHeight(row, HD, D, space) {
-    this.adaptor.setStyle(row.chtml, 'height', this.em(HD + space));
-    const ralign = row.node.attributes.get('rowalign') ;
+   setRowHeight(
+    row,
+    HD,
+    D,
+    space
+  ) {
+    this.adaptor.setStyle(row.chtml, "height", this.em(HD + space));
+    const ralign = row.node.attributes.get("rowalign") ;
     //
     //  Loop through the cells and set the strut height and depth.
     //    The strut is the last element in the cell.
@@ -24061,16 +24199,23 @@ CommonMtableMixin(CHTMLWrapper) {
    * @param {number] D           The new depth for the row
    * @return {boolean}           True if no other cells in this row need to be processed
    */
-   setCellBaseline(cell, ralign, HD, D) {
-    const calign = cell.node.attributes.get('rowalign');
-    if (calign === 'baseline' || calign === 'axis') {
+   setCellBaseline(
+    cell,
+    ralign,
+    HD,
+    D
+  ) {
+    const calign = cell.node.attributes.get("rowalign");
+    if (calign === "baseline" || calign === "axis") {
       const adaptor = this.adaptor;
       const child = adaptor.lastChild(cell.chtml) ;
-      adaptor.setStyle(child, 'height', this.em(HD));
-      adaptor.setStyle(child, 'verticalAlign', this.em(-D));
+      adaptor.setStyle(child, "height", this.em(HD));
+      adaptor.setStyle(child, "verticalAlign", this.em(-D));
       const row = cell.parent;
-      if ((!row.node.isKind('mlabeledtr') || cell !== row.childNodes[0]) &&
-          (ralign === 'baseline' || ralign === 'axis')) {
+      if (
+        (!row.node.isKind("mlabeledtr") || cell !== row.childNodes[0]) &&
+        (ralign === "baseline" || ralign === "axis")
+      ) {
         return true;
       }
     }
@@ -24082,7 +24227,11 @@ CommonMtableMixin(CHTMLWrapper) {
    */
    handleFrame() {
     if (this.frame) {
-      this.adaptor.setStyle(this.itable, 'border', '.07em ' + this.node.attributes.get('frame'));
+      this.adaptor.setStyle(
+        this.itable,
+        "border",
+        ".07em " + this.node.attributes.get("frame")
+      );
     }
   }
 
@@ -24091,28 +24240,32 @@ CommonMtableMixin(CHTMLWrapper) {
    */
    handleWidth() {
     const adaptor = this.adaptor;
-    const {w, L, R} = this.getBBox();
-    adaptor.setStyle(this.chtml, 'minWidth', this.em(L + w + R));
-    let W = this.node.attributes.get('width') ;
+    const { w, L, R } = this.getBBox();
+    adaptor.setStyle(this.chtml, "minWidth", this.em(L + w + R));
+    let W = this.node.attributes.get("width") ;
     if (isPercent(W)) {
-      adaptor.setStyle(this.chtml, 'width', '');
-      adaptor.setAttribute(this.chtml, 'width', 'full');
+      adaptor.setStyle(this.chtml, "width", "");
+      adaptor.setAttribute(this.chtml, "width", "full");
     } else if (!this.hasLabels) {
-      if (W === 'auto') return;
+      if (W === "auto") return;
       W = this.em(this.length2em(W) + 2 * this.fLine);
     }
     const table = adaptor.firstChild(this.chtml) ;
-    adaptor.setStyle(table, 'width', W);
-    adaptor.setStyle(table, 'minWidth', this.em(w));
+    adaptor.setStyle(table, "width", W);
+    adaptor.setStyle(table, "minWidth", this.em(w));
     if (L || R) {
-      adaptor.setStyle(this.chtml, 'margin', '');
+      adaptor.setStyle(this.chtml, "margin", "");
       if (L === R) {
-        adaptor.setStyle(table, 'margin', '0 ' + this.em(R));
+        adaptor.setStyle(table, "margin", "0 " + this.em(R));
       } else {
-        adaptor.setStyle(table, 'margin', '0 ' + this.em(R) + ' 0 ' + this.em(L));
+        adaptor.setStyle(
+          table,
+          "margin",
+          "0 " + this.em(R) + " 0 " + this.em(L)
+        );
       }
     }
-    adaptor.setAttribute(this.itable, 'width', 'full');
+    adaptor.setAttribute(this.itable, "width", "full");
   }
 
   /**
@@ -24121,13 +24274,13 @@ CommonMtableMixin(CHTMLWrapper) {
    handleAlign() {
     const [align, row] = this.getAlignmentRow();
     if (row === null) {
-      if (align !== 'axis') {
-        this.adaptor.setAttribute(this.chtml, 'align', align);
+      if (align !== "axis") {
+        this.adaptor.setAttribute(this.chtml, "align", align);
       }
     } else {
       const y = this.getVerticalPosition(row, align);
-      this.adaptor.setAttribute(this.chtml, 'align', 'top');
-      this.adaptor.setStyle(this.chtml, 'verticalAlign', this.em(y));
+      this.adaptor.setAttribute(this.chtml, "align", "top");
+      this.adaptor.setStyle(this.chtml, "verticalAlign", this.em(y));
     }
   }
 
@@ -24136,8 +24289,8 @@ CommonMtableMixin(CHTMLWrapper) {
    */
    handleJustify() {
     const align = this.getAlignShift()[0];
-    if (align !== 'center') {
-      this.adaptor.setAttribute(this.chtml, 'justify', align);
+    if (align !== "center") {
+      this.adaptor.setAttribute(this.chtml, "justify", align);
     }
   }
 
@@ -24154,10 +24307,10 @@ CommonMtableMixin(CHTMLWrapper) {
     //
     //  Set the side for the labels
     //
-    const side = attributes.get('side') ;
-    adaptor.setAttribute(this.chtml, 'side', side);
-    adaptor.setAttribute(labels, 'align', side);
-    adaptor.setStyle(labels, side, '0');
+    const side = attributes.get("side") ;
+    adaptor.setAttribute(this.chtml, "side", side);
+    adaptor.setAttribute(labels, "align", side);
+    adaptor.setStyle(labels, side, "0");
     //
     //  Make sure labels don't overlap table
     //
@@ -24181,16 +24334,21 @@ CommonMtableMixin(CHTMLWrapper) {
    * @return {[string, number]}   The alignment and shift values
    */
    addLabelPadding(side) {
-    const [ , align, shift] = this.getPadAlignShift(side);
+    const [, align, shift] = this.getPadAlignShift(side);
     const styles = {};
-    if (side === 'right') {
-      const W = this.node.attributes.get('width') ;
-      const {w, L, R} = this.getBBox();
+    if (side === "right") {
+      const W = this.node.attributes.get("width") ;
+      const { w, L, R } = this.getBBox();
       styles.style = {
-        width: (isPercent(W) ? 'calc(' + W + ' + ' + this.em(L + R) + ')' : this.em(L + w + R))
+        width: isPercent(W)
+          ? "calc(" + W + " + " + this.em(L + R) + ")"
+          : this.em(L + w + R),
       };
     }
-    this.adaptor.append(this.chtml, this.html('mjx-labels', styles, [this.labels]));
+    this.adaptor.append(
+      this.chtml,
+      this.html("mjx-labels", styles, [this.labels])
+    );
     return [align, shift] ;
   }
 
@@ -24199,15 +24357,15 @@ CommonMtableMixin(CHTMLWrapper) {
    *   and set the baseline for labels that are baseline aligned.
    */
    updateRowHeights() {
-    if (this.node.attributes.get('equalrows') ) return;
-    let {H, D, NH, ND} = this.getTableData();
+    if (this.node.attributes.get("equalrows") ) return;
+    let { H, D, NH, ND } = this.getTableData();
     const space = this.getRowHalfSpacing();
     for (let i = 0; i < this.numRows; i++) {
       const row = this.childNodes[i];
       if (H[i] !== NH[i] || D[i] !== ND[i]) {
         this.setRowHeight(row, H[i] + D[i], D[i], space[i] + space[i + 1]);
-      } else if (row.node.isKind('mlabeledtr')) {
-        this.setCellBaseline(row.childNodes[0], '', H[i] + D[i], D[i]);
+      } else if (row.node.isKind("mlabeledtr")) {
+        this.setCellBaseline(row.childNodes[0], "", H[i] + D[i], D[i]);
       }
     }
   }
@@ -24217,9 +24375,9 @@ CommonMtableMixin(CHTMLWrapper) {
    */
    addLabelSpacing() {
     const adaptor = this.adaptor;
-    const equal = this.node.attributes.get('equalrows') ;
-    const {H, D} = this.getTableData();
-    const HD = (equal ? this.getEqualRowHeight() : 0);
+    const equal = this.node.attributes.get("equalrows") ;
+    const { H, D } = this.getTableData();
+    const HD = equal ? this.getEqualRowHeight() : 0;
     const space = this.getRowHalfSpacing();
     //
     //  Start with frame size and add in spacing, height and depth,
@@ -24229,17 +24387,25 @@ CommonMtableMixin(CHTMLWrapper) {
     let current = adaptor.firstChild(this.labels) ;
     for (let i = 0; i < this.numRows; i++) {
       const row = this.childNodes[i];
-      if (row.node.isKind('mlabeledtr')) {
-        h && adaptor.insert(this.html('mjx-mtr', {style: {height: this.em(h)}}), current);
-        adaptor.setStyle(current, 'height', this.em((equal ? HD : H[i] + D[i]) + space[i] + space[i + 1]));
+      if (row.node.isKind("mlabeledtr")) {
+        h &&
+          adaptor.insert(
+            this.html("mjx-mtr", { style: { height: this.em(h) } }),
+            current
+          );
+        adaptor.setStyle(
+          current,
+          "height",
+          this.em((equal ? HD : H[i] + D[i]) + space[i] + space[i + 1])
+        );
         current = adaptor.next(current) ;
         h = this.rLines[i];
       } else {
-        h += space[i] + (equal ? HD : H[i] + D[i]) + space[i + 1] + this.rLines[i];
+        h +=
+          space[i] + (equal ? HD : H[i] + D[i]) + space[i + 1] + this.rLines[i];
       }
     }
   }
-
 } CHTMLmtable.__initStatic(); CHTMLmtable.__initStatic2();
 
 /*****************************************************************/
@@ -25794,7 +25960,1827 @@ CommonTextNodeMixin(CHTMLWrapper) {
 
 } CHTMLTextNode.__initStatic(); CHTMLTextNode.__initStatic2(); CHTMLTextNode.__initStatic3();
 
-const CHTMLWrappers  = {
+var _class$a;
+
+/*****************************************************************/
+/**
+ * The heights, depths, and widths of the rows and columns
+ * Plus the natural height and depth (i.e., without the labels)
+ * Plus the label column width
+ */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*****************************************************************/
+/**
+ * The CommonMtable wrapper mixin for the MmlMtable object
+ *
+ * @template C  The table cell class
+ * @temlpate R  the table row class
+ * @template T  The Wrapper class constructor type
+ */
+function CommonMstackMixin
+
+
+
+(Base) {
+  return (_class$a = class extends Base {
+    /**
+     * The number of columns in the table
+     */
+     __init() {this.numCols = 0;}
+    /**
+     * The number of rows in the table
+     */
+     __init2() {this.numRows = 0;}
+
+    /**
+     * True if there are labeled rows
+     */
+    
+
+    /**
+     * True if this mtable is the top element, or in a top-most mrow
+     */
+    
+
+    /**
+     * The parent node of this table (skipping non-parents and mrows)
+     */
+    
+    /**
+     * The position of the table as a child node of its container
+     */
+    
+
+    /**
+     * True if there is a frame
+     */
+    
+    /**
+     * The size of the frame line (or 0 if none)
+     */
+    
+    /**
+     * frame spacing on the left and right
+     */
+    
+    /**
+     * The spacing between columns
+     */
+    
+    /**
+     * The spacing between rows
+     */
+    
+    /**
+     * The width of columns lines (or 0 if no line for the column)
+     */
+    
+    /**
+     * The width of row lines (or 0 if no lone for that row)
+     */
+    
+    /**
+     * The column widths (or percentages, etc.)
+     */
+    
+
+    /**
+     * The bounding box information for the table rows and columns
+     */
+     __init3() {this.data = null;}
+
+    /**
+     * The table cells that have percentage-width content
+     */
+     __init4() {this.pwidthCells = [];}
+
+    /**
+     * The full width of a percentage-width table
+     */
+     __init5() {this.pWidth = 0;}
+
+    /**
+     * @return {R[]}  The rows of the table
+     */
+    get tableRows() {
+      return this.childNodes;
+    }
+
+    /******************************************************************/
+
+    /**
+     * @override
+     * @constructor
+     */
+    constructor(...args) {
+      super(...args);_class$a.prototype.__init.call(this);_class$a.prototype.__init2.call(this);_class$a.prototype.__init3.call(this);_class$a.prototype.__init4.call(this);_class$a.prototype.__init5.call(this);      //
+      // Determine the number of columns and rows, and whether the table is stretchy
+      //
+      this.numCols = max(this.tableRows.map((row) => row.numCells));
+      this.numRows = this.childNodes.length;
+      this.hasLabels = this.childNodes.reduce(
+        (value, row) => value || row.node.isKind('mlabeledtr'),
+        false
+      );
+      this.findContainer();
+      this.isTop =
+        !this.container ||
+        (this.container.node.isKind('math') && !this.container.parent);
+      if (this.isTop) {
+        this.jax.table = this;
+      }
+      // this.getPercentageWidth();
+      //
+      // Get the frame, row, and column parameters
+      //
+      const attributes = this.node.attributes;
+      this.frame = attributes.get('frame') !== 'none';
+      this.fLine = this.frame ? 0.07 : 0;
+      this.fSpace = this.frame
+        ? this.convertLengths(this.getAttributeArray('framespacing'))
+        : [0, 0];
+      this.cSpace = this.convertLengths(
+        this.getColumnAttributes('columnspacing')
+      );
+      this.rSpace = this.convertLengths(this.getRowAttributes('rowspacing'));
+      this.cLines = this.getColumnAttributes('columnlines').map((x) =>
+        x === 'none' ? 0 : 0.07
+      );
+      this.rLines = this.getRowAttributes('rowlines').map((x) =>
+        x === 'none' ? 0 : 0.07
+      );
+      this.cWidths = this.getColumnWidths();
+      //
+      // Stretch the rows and columns
+      //
+      this.stretchRows();
+      this.stretchColumns();
+    }
+
+    /**
+     * Find the container and the child position of the table
+     */
+     findContainer() {
+      let node = this ;
+      let parent = node.parent ;
+      while (parent && (parent.node.notParent || parent.node.isKind('mrow'))) {
+        node = parent;
+        parent = parent.parent;
+      }
+      this.container = parent;
+      this.containerI = node.node.childPosition();
+    }
+
+    /**
+     * If the table has a precentage width or has labels, set the pwidth of the bounding box
+     */
+     getPercentageWidth() {
+      if (this.hasLabels) {
+        this.bbox.pwidth = BBox.fullWidth;
+        return 0;
+      } else {
+        return 0;
+      }
+    }
+
+    /**
+     * Stretch the rows to the equal height or natural height
+     */
+     stretchRows() {
+      const equal = this.node.attributes.get('equalrows') ;
+      const HD = equal ? this.getEqualRowHeight() : 0;
+      const { H, D } = equal ? this.getTableData() : { H: [0], D: [0] };
+      const rows = this.tableRows;
+      for (let i = 0; i < this.numRows; i++) {
+        const hd = equal
+          ? [(HD + H[i] - D[i]) / 2, (HD - H[i] + D[i]) / 2]
+          : null;
+        console.log('rows[i]', rows[i]);
+        // rows[i].stretchChildren(hd);
+      }
+    }
+
+    /**
+     * Stretch the columns to their proper widths
+     */
+     stretchColumns() {
+      for (let i = 0; i < this.numCols; i++) {
+        const width =
+          typeof this.cWidths[i] === 'number'
+            ? (this.cWidths[i] )
+            : null;
+        this.stretchColumn(i, width);
+      }
+    }
+
+    /**
+     * Handle horizontal stretching within the ith column
+     *
+     * @param {number} i   The column number
+     * @param {number} W   The computed width of the column (or null of not computed)
+     */
+     stretchColumn(i, W) {
+      let stretchy = [];
+      //
+      //  Locate and count the stretchy children
+      //
+      for (const row of this.tableRows) {
+        const cell = row.getChild(i);
+        if (cell) {
+          const child = cell.childNodes[0];
+          if (
+            child.stretch.dir === DIRECTION.None &&
+            child.canStretch(DIRECTION.Horizontal)
+          ) {
+            stretchy.push(child);
+          }
+        }
+      }
+      let count = stretchy.length;
+      let nodeCount = this.childNodes.length;
+      if (count && nodeCount > 1) {
+        if (W === null) {
+          W = 0;
+          //
+          //  If all the children are stretchy, find the largest one,
+          //  otherwise, find the width of the non-stretchy children.
+          //
+          let all = count > 1 && count === nodeCount;
+          for (const row of this.tableRows) {
+            const cell = row.getChild(i);
+            if (cell) {
+              const child = cell.childNodes[0];
+              const noStretch = child.stretch.dir === DIRECTION.None;
+              if (all || noStretch) {
+                const { w } = child.getBBox(noStretch);
+                if (w > W) {
+                  W = w;
+                }
+              }
+            }
+          }
+        }
+        //
+        //  Stretch the stretchable children
+        //
+        for (const child of stretchy) {
+          (child.coreMO() ).getStretchedVariant([W]);
+        }
+      }
+    }
+
+    /******************************************************************/
+
+    /**
+     * Determine the row heights and depths, the column widths,
+     * and the natural width and height of the table.
+     *
+     * @return {TableData}  The dimensions of the rows and columns
+     */
+     getTableData() {
+      return {} ;
+      // if (this.data) {
+      //   return this.data;
+      // }
+      // const H = new Array(this.numRows).fill(0);
+      // const D = new Array(this.numRows).fill(0);
+      // const W = new Array(this.numCols).fill(0);
+      // const NH = new Array(this.numRows);
+      // const ND = new Array(this.numRows);
+      // const LW = [0];
+      // const rows = this.tableRows;
+      // for (let j = 0; j < rows.length; j++) {
+      //   const row = rows[j];
+      //   for (let i = 0; i < row.numCells; i++) {
+      //     const cell = row.getChild(i);
+      //     this.updateHDW(cell, i, j, H, D, W);
+      //     this.recordPWidthCell(cell, i);
+      //   }
+      //   NH[j] = H[j];
+      //   ND[j] = D[j];
+      //   if (row.labeled) {
+      //     this.updateHDW(row.childNodes[0], 0, j, H, D, LW);
+      //   }
+      // }
+      // const L = LW[0];
+      // this.data = { H, D, W, NH, ND, L };
+      // return this.data;
+    }
+
+    /**
+     * @param {C} cell         The cell whose height, depth, and width are to be added into the H, D, W arrays
+     * @param {number} i       The column number for the cell
+     * @param {number} j       The row number for the cell
+     * @param {number[]} H     The maximum height for each of the rows
+     * @param {number[]} D     The maximum depth for each of the rows
+     * @param {number[]=} W    The maximum width for each column
+     */
+     updateHDW(
+      cell,
+      i,
+      j,
+      H,
+      D,
+      W = null
+    ) {
+      let { h, d, w } = cell.getBBox();
+      if (h < 0.75) h = 0.75;
+      if (d < 0.25) d = 0.25;
+      if (h > H[j]) H[j] = h;
+      if (d > D[j]) D[j] = d;
+      if (W && w > W[i]) W[i] = w;
+    }
+
+    /**
+     * @param {C} cell     The cell to check for percentage widths
+     * @param {number} i   The column index of the cell
+     */
+     recordPWidthCell(cell, i) {
+      if (cell.childNodes[0] && cell.childNodes[0].getBBox().pwidth) {
+        this.pwidthCells.push([cell, i]);
+      }
+    }
+
+    /**
+     * @override
+     */
+     computeBBox(bbox, _recompute = false) {
+      return;
+      // const { H, D } = this.getTableData();
+      // let height, width;
+      // //
+      // // For equal rows, use the common height and depth for all rows
+      // // Otherwise, use the height and depths for each row separately.
+      // // Add in the spacing, line widths, and frame size.
+      // //
+      // if (this.node.attributes.get('equalrows') as boolean) {
+      //   const HD = this.getEqualRowHeight();
+      //   height = sum([].concat(this.rLines, this.rSpace)) + HD * this.numRows;
+      // } else {
+      //   height = sum(H.concat(D, this.rLines, this.rSpace));
+      // }
+      // height += 2 * (this.fLine + this.fSpace[1]);
+      // //
+      // //  Get the widths of all columns
+      // //
+      // const CW = this.getComputedWidths();
+      // //
+      // //  Get the expected width of the table
+      // //
+      // width =
+      //   sum(CW.concat(this.cLines, this.cSpace)) +
+      //   2 * (this.fLine + this.fSpace[0]);
+      // //
+      // //  If the table width is not 'auto', determine the specified width
+      // //    and pick the larger of the specified and computed widths.
+      // //
+      // const w = this.node.attributes.get('width') as string;
+      // if (w !== 'auto') {
+      //   width = Math.max(this.length2em(w, 0) + 2 * this.fLine, width);
+      // }
+      // //
+      // //  Return the bounding box information
+      // //
+      // let [h, d] = this.getBBoxHD(height);
+      // bbox.h = h;
+      // bbox.d = d;
+      // bbox.w = width;
+      // let [L, R] = this.getBBoxLR();
+      // bbox.L = L;
+      // bbox.R = R;
+      // //
+      // //  Handle cell widths if width is not a percentage
+      // //
+      // if (!isPercent(w)) {
+      //   this.setColumnPWidths();
+      // }
+    }
+
+    /**
+     * @override
+     */
+     setChildPWidths(
+      _recompute,
+      cwidth,
+      _clear
+    ) {
+      const width = this.node.attributes.get('width') ;
+      if (!isPercent(width)) return false;
+      if (!this.hasLabels) {
+        this.bbox.pwidth = '';
+        this.container.bbox.pwidth = '';
+      }
+      const { w, L, R } = this.bbox;
+      const W = Math.max(w, this.length2em(width, Math.max(cwidth, L + w + R)));
+      const cols = (this.node.attributes.get('equalcolumns') )
+        ? Array(this.numCols).fill(this.percent(1 / Math.max(1, this.numCols)))
+        : this.getColumnAttributes('columnwidth', 0);
+      this.cWidths = this.getColumnWidthsFixed(cols, W);
+      const CW = this.getComputedWidths();
+      this.pWidth =
+        sum(CW.concat(this.cLines, this.cSpace)) +
+        2 * (this.fLine + this.fSpace[0]);
+      if (this.isTop) {
+        this.bbox.w = this.pWidth;
+      }
+      this.setColumnPWidths();
+      if (this.pWidth !== w) {
+        this.parent.invalidateBBox();
+      }
+      return this.pWidth !== w;
+    }
+
+    /**
+     * Finalize any cells that have percentage-width content
+     */
+     setColumnPWidths() {
+      const W = this.cWidths ;
+      for (const [cell, i] of this.pwidthCells) {
+        if (cell.setChildPWidths(false, W[i])) {
+          cell.invalidateBBox();
+          cell.getBBox();
+        }
+      }
+    }
+
+    /**
+     * @param {number} height   The total height of the table
+     * @return {[number, number]}  The [height, depth] for the aligned table
+     */
+     getBBoxHD(height) {
+      const [align, row] = this.getAlignmentRow();
+      if (row === null) {
+        const a = this.font.params.axis_height;
+        const h2 = height / 2;
+        const HD = {
+          top: [0, height],
+          center: [h2, h2],
+          bottom: [height, 0],
+          baseline: [h2, h2],
+          axis: [h2 + a, h2 - a],
+        };
+        return HD[align] || [h2, h2];
+      } else {
+        const y = this.getVerticalPosition(row, align);
+        return [y, height - y];
+      }
+    }
+
+    /**
+     * Get bbox left and right amounts to cover labels
+     */
+     getBBoxLR() {
+      if (this.hasLabels) {
+        const side = this.node.attributes.get('side') ;
+        const [pad, align] = this.getPadAlignShift(side);
+        return align === 'center'
+          ? [pad, pad]
+          : side === 'left'
+          ? [pad, 0]
+          : [0, pad];
+      }
+      return [0, 0];
+    }
+
+    /**
+     * @param {string} side                 The side for the labels
+     * @return {[number, string, number]}   The padding, alignment, and shift amounts
+     */
+     getPadAlignShift(side) {
+      //
+      //  Make sure labels don't overlap table
+      //
+      const { L } = this.getTableData();
+      const sep = this.length2em(this.node.attributes.get('minlabelspacing'));
+      let pad = L + sep;
+      const [lpad, rpad] =
+        this.styles == null
+          ? ['', '']
+          : [this.styles.get('padding-left'), this.styles.get('padding-right')];
+      if (lpad || rpad) {
+        pad = Math.max(
+          pad,
+          this.length2em(lpad || '0'),
+          this.length2em(rpad || '0')
+        );
+      }
+      //
+      //  Handle indentation
+      //
+      let [align, shift] = this.getAlignShift();
+      if (align === side) {
+        shift =
+          side === 'left'
+            ? Math.max(pad, shift) - pad
+            : Math.min(-pad, shift) + pad;
+      }
+      return [pad, align, shift] ;
+    }
+
+    /**
+     * @override
+     */
+     getAlignShift() {
+      return this.isTop
+        ? super.getAlignShift()
+        : ([this.container.getChildAlign(this.containerI), 0] 
+
+
+);
+    }
+
+    /**
+     * @return {number}    The true width of the table (without labels)
+     */
+     getWidth() {
+      return this.pWidth || this.getBBox().w;
+    }
+
+    /******************************************************************/
+
+    /**
+     * @return {number}   The maximum height of a row
+     */
+     getEqualRowHeight() {
+      const { H, D } = this.getTableData();
+      const HD = Array.from(H.keys()).map((i) => H[i] + D[i]);
+      return Math.max.apply(Math, HD);
+    }
+
+    /**
+     * @return {number[]}   The array of computed widths
+     */
+     getComputedWidths() {
+      const W = this.getTableData().W;
+      let CW = Array.from(W.keys()).map((i) => {
+        return typeof this.cWidths[i] === 'number'
+          ? (this.cWidths[i] )
+          : W[i];
+      });
+      if (this.node.attributes.get('equalcolumns') ) {
+        CW = Array(CW.length).fill(max(CW));
+      }
+      return CW;
+    }
+
+    /**
+     * Determine the column widths that can be computed (and need to be set).
+     * The resulting arrays will have numbers for fixed-size arrays,
+     *   strings for percentage sizes that can't be determined now,
+     *   and null for stretchy columns that will expand to fill the extra space.
+     * Depending on the width specified for the table, different column
+     *  values can be determined.
+     *
+     * @return {(string|number|null)[]}  The array of widths
+     */
+     getColumnWidths() {
+      return [0];
+      // const width = this.node.attributes.get('width') as string;
+      // if (this.node.attributes.get('equalcolumns') as boolean) {
+      //   return this.getEqualColumns(width);
+      // }
+      // const swidths = this.getColumnAttributes('columnwidth', 0);
+      // if (width === 'auto') {
+      //   return this.getColumnWidthsAuto(swidths);
+      // }
+      // if (isPercent(width)) {
+      //   return this.getColumnWidthsPercent(swidths);
+      // }
+      // return this.getColumnWidthsFixed(swidths, this.length2em(width));
+    }
+
+    /**
+     * For tables with equal columns, get the proper amount per column.
+     *
+     * @param {string} width   The width attribute of the table
+     * @return {(string|number|null)[]}  The array of widths
+     */
+     getEqualColumns(width) {
+      const n = Math.max(1, this.numCols);
+      let cwidth;
+      if (width === 'auto') {
+        const { W } = this.getTableData();
+        cwidth = max(W);
+      } else if (isPercent(width)) {
+        cwidth = this.percent(1 / n);
+      } else {
+        const w = sum([].concat(this.cLines, this.cSpace)) + 2 * this.fSpace[0];
+        cwidth = Math.max(0, this.length2em(width) - w) / n;
+      }
+      return Array(this.numCols).fill(cwidth);
+    }
+
+    /**
+     * For tables with width="auto", auto and fit columns
+     * will end up being natural width, so don't need to
+     * set those explicitly.
+     *
+     * @param {string[]} swidths   The split and padded columnwidths attribute
+     * @return {ColumnWidths}  The array of widths
+     */
+     getColumnWidthsAuto(swidths) {
+      return swidths.map((x) => {
+        if (x === 'auto' || x === 'fit') return null;
+        if (isPercent(x)) return x;
+        return this.length2em(x);
+      });
+    }
+
+    /**
+     * For tables with percentage widths, let 'fit' columns (or 'auto'
+     * columns if there are not 'fit' ones) will stretch automatically,
+     * but for 'auto' columns (when there are 'fit' ones), set the size
+     * to the natural size of the column.
+     *
+     * @param {string[]} swidths   The split and padded columnwidths attribute
+     * @return {ColumnWidths}      The array of widths
+     */
+     getColumnWidthsPercent(swidths) {
+      const hasFit = swidths.indexOf('fit') >= 0;
+      const { W } = hasFit ? this.getTableData() : { W: null };
+      return Array.from(swidths.keys()).map((i) => {
+        const x = swidths[i];
+        if (x === 'fit') return null;
+        if (x === 'auto') return hasFit ? W[i] : null;
+        if (isPercent(x)) return x;
+        return this.length2em(x);
+      });
+    }
+
+    /**
+     * For fixed-width tables, compute the column widths of all columns.
+     *
+     * @param {string[]} swidths   The split and padded columnwidths attribute
+     * @param {number} width       The width of the table
+     * @return {ColumnWidths}      The array of widths
+     */
+     getColumnWidthsFixed(
+      swidths,
+      width
+    ) {
+      //
+      // Get the indices of the fit and auto columns, and the number of fit or auto entries.
+      // If there are fit or auto columns, get the column widths.
+      //
+      const indices = Array.from(swidths.keys());
+      const fit = indices.filter((i) => swidths[i] === 'fit');
+      const auto = indices.filter((i) => swidths[i] === 'auto');
+      const n = fit.length || auto.length;
+      const { W } = n ? this.getTableData() : { W: null };
+      //
+      // Determine the space remaining from the fixed width after the
+      //   separation and lines have been removed (cwidth), and
+      //   after the width of the columns have been removed (dw).
+      //
+      const cwidth =
+        width - sum([].concat(this.cLines, this.cSpace)) - 2 * this.fSpace[0];
+      let dw = cwidth;
+      indices.forEach((i) => {
+        const x = swidths[i];
+        dw -= x === 'fit' || x === 'auto' ? W[i] : this.length2em(x, width);
+      });
+      //
+      // Get the amount of extra space per column, or 0 (fw)
+      //
+      const fw = n && dw > 0 ? dw / n : 0;
+      //
+      // Return the column widths (plus extra space for those that are stretching
+      //
+      return indices.map((i) => {
+        const x = swidths[i];
+        if (x === 'fit') return W[i] + fw;
+        if (x === 'auto') return W[i] + (fit.length === 0 ? fw : 0);
+        return this.length2em(x, cwidth);
+      });
+    }
+
+    /**
+     * @param {number} i      The row number (starting at 0)
+     * @param {string} align  The alignment on that row
+     * @return {number}       The offest of the alignment position from the top of the table
+     */
+     getVerticalPosition(i, align) {
+      const equal = this.node.attributes.get('equalrows') ;
+      const { H, D } = this.getTableData();
+      const HD = equal ? this.getEqualRowHeight() : 0;
+      const space = this.getRowHalfSpacing();
+      //
+      //  Start with frame size and add in spacing, height and depth,
+      //    and line thickness for each row.
+      //
+      let y = this.fLine;
+      for (let j = 0; j < i; j++) {
+        y +=
+          space[j] + (equal ? HD : H[j] + D[j]) + space[j + 1] + this.rLines[j];
+      }
+      //
+      //  For equal rows, get updated height and depth
+      //
+      const [h, d] = equal
+        ? [(HD + H[i] - D[i]) / 2, (HD - H[i] + D[i]) / 2]
+        : [H[i], D[i]];
+      //
+      //  Add the offset into the specified row
+      //
+      const offset = {
+        top: 0,
+        center: space[i] + (h + d) / 2,
+        bottom: space[i] + h + d + space[i + 1],
+        baseline: space[i] + h,
+        axis: space[i] + h - 0.25,
+      };
+      y += offset[align] || 0;
+      //
+      //  Return the final result
+      //
+      return y;
+    }
+
+    /******************************************************************/
+
+    /**
+     * @param {number} fspace   The frame spacing to use
+     * @param {number[]} space  The array of spacing values to convert to strings
+     * @return {string[]}       The half-spacing as stings with units of "em"
+     *                           with frame spacing at the beginning and end
+     */
+     getEmHalfSpacing(fspace, space) {
+      //
+      //  Get the column spacing values, and add the frame spacing values at the left and right
+      //
+      const fspaceEm = this.em(fspace);
+      const spaceEm = this.addEm(space, 2);
+      spaceEm.unshift(fspaceEm);
+      spaceEm.push(fspaceEm);
+      return spaceEm;
+    }
+
+    /**
+     * @return {number[]}   The half-spacing for rows with frame spacing at the ends
+     */
+     getRowHalfSpacing() {
+      const space = this.rSpace.map((x) => x / 2);
+      space.unshift(this.fSpace[1]);
+      space.push(this.fSpace[1]);
+      return space;
+    }
+
+    /**
+     * @return {number[]}   The half-spacing for columns with frame spacing at the ends
+     */
+     getColumnHalfSpacing() {
+      const space = this.cSpace.map((x) => x / 2);
+      space.unshift(this.fSpace[0]);
+      space.push(this.fSpace[0]);
+      return space;
+    }
+
+    /**
+     * @return {[string,number|null]}  The alignment and row number (based at 0) or null
+     */
+     getAlignmentRow() {
+      const [align, row] = split(this.node.attributes.get('align') );
+      if (row == null) return [align, null];
+      let i = parseInt(row);
+      if (i < 0) i += this.numRows + 1;
+      return [align, i < 1 || i > this.numRows ? null : i - 1];
+    }
+
+    /**
+     * @param {string} name           The name of the attribute to get as an array
+     * @param {number=} i             Return this many fewer than numCols entries
+     * @return {string[]}             The array of values in the given attribute, split at spaces,
+     *                                 padded to the number of table columns (minus 1) by repeating the last entry
+     */
+     getColumnAttributes(name, i = 1) {
+      const n = this.numCols - i;
+      const columns = this.getAttributeArray(name);
+      if (columns.length === 0) return null;
+      while (columns.length < n) {
+        columns.push(columns[columns.length - 1]);
+      }
+      if (columns.length > n) {
+        columns.splice(n);
+      }
+      return columns;
+    }
+
+    /**
+     * @param {string} name           The name of the attribute to get as an array
+     * @param {number=} i             Return this many fewer than numRows entries
+     * @return {string[]}             The array of values in the given attribute, split at spaces,
+     *                                 padded to the number of table rows (minus 1) by repeating the last entry
+     */
+     getRowAttributes(name, i = 1) {
+      const n = this.numRows - i;
+      const rows = this.getAttributeArray(name);
+      if (rows.length === 0) return null;
+      while (rows.length < n) {
+        rows.push(rows[rows.length - 1]);
+      }
+      if (rows.length > n) {
+        rows.splice(n);
+      }
+      return rows;
+    }
+
+    /**
+     * @param {string} name           The name of the attribute to get as an array
+     * @return {string[]}             The array of values in the given attribute, split at spaces
+     *                                 (after leading and trailing spaces are removed, and multiple
+     *                                  spaces have been collapsed to one).
+     */
+     getAttributeArray(name) {
+      const value = this.node.attributes.get(name) ;
+      if (!value) return [this.node.attributes.getDefault(name) ];
+      return split(value);
+    }
+
+    /**
+     * Adds "em" to a list of dimensions, after dividing by n (defaults to 1).
+     *
+     * @param {string[]} list   The array of dimensions (in em's)
+     * @param {nunber=} n       The number to divide each dimension by after converted
+     * @return {string[]}       The array of values with "em" added
+     */
+     addEm(list, n = 1) {
+      if (!list) return null;
+      return list.map((x) => this.em(x / n));
+    }
+
+    /**
+     * Converts an array of dimensions (with arbitrary units) to an array of numbers
+     *   representing the dimensions in units of em's.
+     *
+     * @param {string[]} list   The array of dimensions to be turned into em's
+     * @return {number[]}       The array of values converted to em's
+     */
+     convertLengths(list) {
+      if (!list) return null;
+      return list.map((x) => this.length2em(x));
+    }
+  }, _class$a);
+}
+
+/*****************************************************************/
+/**
+ * The CHTMLmtable wrapper for the MmlMtable object
+ *
+ * @template N  The HTMLElement node class
+ * @template T  The Text node class
+ * @template D  The Document class
+ */
+class CHTMLmstack extends CommonMstackMixin
+
+
+
+(CHTMLWrapper) {
+  /**
+   * The mtable wrapper
+   */
+   static __initStatic() {this.kind = MmlMstack.prototype.kind;}
+
+  /**
+   * @override
+   */
+   static __initStatic2() {this.styles = {
+    'mjx-mstack > table': {
+      'border-spacing': '0.0rem 1rem',
+      'border-collapse': 'separate',
+    },
+    'mjx-mstack > table > tr > td': {
+      // padding: '1.2rem',
+    },
+    'mjx-mstack > table > tr > .mjx-line': {
+      padding: 0,
+      'border-top': 'solid 1px black',
+    },
+    // 'mjx-mstack': {
+    //   'vertical-align': '.25em',
+    //   'text-align': 'center',
+    //   position: 'relative',
+    //   'box-sizing': 'border-box',
+    // },
+    // 'mjx-labels': {
+    //   position: 'absolute',
+    //   left: 0,
+    //   top: 0,
+    // },
+    // 'mjx-table': {
+    //   display: 'inline-block',
+    //   'vertical-align': '-.5ex',
+    // },
+    // 'mjx-table > mjx-itable': {
+    //   'vertical-align': 'middle',
+    //   'text-align': 'left',
+    //   'box-sizing': 'border-box',
+    // },
+    // 'mjx-labels > mjx-itable': {
+    //   position: 'absolute',
+    //   top: 0,
+    // },
+    // 'mjx-mstack[justify="left"]': {
+    //   'text-align': 'left',
+    // },
+    // 'mjx-mstack[justify="right"]': {
+    //   'text-align': 'right',
+    // },
+    // 'mjx-mstack[justify="left"][side="left"]': {
+    //   'padding-right': '0 ! important',
+    // },
+    // 'mjx-mstack[justify="left"][side="right"]': {
+    //   'padding-left': '0 ! important',
+    // },
+    // 'mjx-mstack[justify="right"][side="left"]': {
+    //   'padding-right': '0 ! important',
+    // },
+    // 'mjx-mstack[justify="right"][side="right"]': {
+    //   'padding-left': '0 ! important',
+    // },
+    // 'mjx-mstack[align]': {
+    //   'vertical-align': 'baseline',
+    // },
+    // 'mjx-mstack[align="top"] > mjx-table': {
+    //   'vertical-align': 'top',
+    // },
+    // 'mjx-mstack[align="bottom"] > mjx-table': {
+    //   'vertical-align': 'bottom',
+    // },
+    // 'mjx-mstack[side="right"] mjx-labels': {
+    //   'min-width': '100%',
+    // },
+  };}
+
+  /**
+   * The column for labels
+   */
+  
+
+  /**
+   * The inner table DOM node
+   */
+  
+
+  /******************************************************************/
+
+  /**
+   * @override
+   */
+  constructor(
+    factory,
+    node,
+    parent = null
+  ) {
+    super(factory, node, parent);
+    this.itable = this.html('mjx-itable');
+    this.labels = this.html('mjx-itable');
+  }
+
+  /**
+   * @override
+   */
+   getAlignShift() {
+    const data = super.getAlignShift();
+    if (!this.isTop) {
+      data[1] = 0;
+    }
+    return data;
+  }
+
+  /**
+   * @override
+   */
+   toCHTML(parent) {
+    //
+    //  Create the rows inside an mjx-itable (which will be used to center the table on the math axis)
+    //
+    const chtml = this.standardCHTMLnode(parent);
+
+    const stackData = [['', 3, 5, 8, 9], ['+', '', 1, 2, 3], ['line'], ['']];
+    const ce = this.adaptor.document.createElement.bind(this.adaptor.document);
+
+    const createRow = (maxCols) => (rowData) => {
+      const tr = ce('tr');
+
+      const cells = rowData.map((r) => {
+        const td = ce('td');
+        if (typeof r === 'number') {
+          td.textContent = r;
+        }
+        if (r === 'line') {
+          td.setAttribute('colspan', maxCols);
+          td.setAttribute('class', 'mjx-line');
+          // td.setAttribute('style', 'border-top: solid 1px black');
+          td.textContent = '';
+        } else if (typeof r === 'string') {
+          td.textContent = r;
+        }
+
+        return td;
+      });
+
+      cells.forEach((c) => tr.appendChild(c));
+      return tr;
+    };
+
+    const generateStack = (rows, parent) => {
+      const maxCols = rows.reduce((acc, r) => {
+        if (r && r.length > acc) {
+          acc = r.length;
+        }
+
+        return acc;
+      }, 0);
+
+      console.log('maxCols:', maxCols);
+
+      if (rows.length <= 0) {
+        return;
+      }
+
+      const table = ce('table');
+      parent.appendChild(table);
+
+      const tableRows = rows.map(createRow(maxCols));
+
+      tableRows.forEach((r) => table.appendChild(r));
+    };
+
+    console.log('chtml?', chtml);
+
+    generateStack(stackData, chtml);
+    // const table = ce('table');
+    // const tr = ce('tr');
+
+    // table.appendChild(tr);
+
+    // const td = ce('td');
+
+    // td.textContent = 'foo';
+    // tr.appendChild(td);
+    // chtml.appendChild(table);
+    //this.adaptor.append(chtml, this.html('mjx-stack', {}, []));
+    // for (const child of this.childNodes) {
+
+    //   console.log('child: ', child);
+    //   child.toCHTML(chtml);
+    // }
+    //
+    //  Pad the rows of the table, if needed
+    //  Then set the column and row attributes for alignment, spacing, and lines
+    //  Finally, add the frame, if needed
+    //
+    this.padRows();
+    this.handleColumnSpacing();
+    this.handleColumnLines();
+    this.handleColumnWidths();
+    this.handleRowSpacing();
+    this.handleRowLines();
+    this.handleEqualRows();
+    this.handleFrame();
+    this.handleWidth();
+    this.handleLabels();
+    this.handleAlign();
+    this.handleJustify();
+    this.shiftColor();
+  }
+
+  /**
+   * Move background color (if any) to inner itable node so that labeled tables are
+   * only colored on the main part of the table.
+   */
+   shiftColor() {
+    const adaptor = this.adaptor;
+    const color = adaptor.getStyle(this.chtml, 'backgroundColor');
+    if (color) {
+      adaptor.setStyle(this.chtml, 'backgroundColor', '');
+      adaptor.setStyle(this.itable, 'backgroundColor', color);
+    }
+  }
+
+  /******************************************************************/
+
+  /**
+   * Pad any short rows with extra cells
+   */
+   padRows() {
+    const adaptor = this.adaptor;
+    for (const row of adaptor.childNodes(this.itable) ) {
+      while (adaptor.childNodes(row).length < this.numCols) {
+        adaptor.append(row, this.html('mjx-mtd'));
+      }
+    }
+  }
+
+  /**
+   * Set the inter-column spacing for all columns
+   *  (Use frame spacing on the outsides, if needed, and use half the column spacing on each
+   *   neighboring column, so that if column lines are needed, they fall in the middle
+   *   of the column space.)
+   */
+   handleColumnSpacing() {
+    return;
+    // const spacing = this.getEmHalfSpacing(this.fSpace[0], this.cSpace);
+    // const frame = this.frame;
+    // //
+    // //  For each row...
+    // //
+    // for (const row of this.tableRows) {
+    //   let i = 0;
+    //   //
+    //   //  For each cell in the row...
+    //   //
+    //   for (const cell of row.tableCells) {
+    //     //
+    //     //  Get the left and right-hand spacing
+    //     //
+    //     const lspace = spacing[i++];
+    //     const rspace = spacing[i];
+    //     //
+    //     //  Set the style for the spacing, if it is needed, and isn't the
+    //     //  default already set in the mtd styles
+    //     //
+    //     const styleNode = cell
+    //       ? cell.chtml
+    //       : (this.adaptor.childNodes(row.chtml)[i] as N);
+    //     if ((i > 1 && lspace !== '0.4em') || (frame && i === 1)) {
+    //       this.adaptor.setStyle(styleNode, 'paddingLeft', lspace);
+    //     }
+    //     if (
+    //       (i < this.numCols && rspace !== '0.4em') ||
+    //       (frame && i === this.numCols)
+    //     ) {
+    //       this.adaptor.setStyle(styleNode, 'paddingRight', rspace);
+    //     }
+    //   }
+    // }
+  }
+
+  /**
+   * Add borders to the left of cells to make the column lines
+   */
+
+   handleColumnLines() {
+    return;
+    // if (this.node.attributes.get('columnlines') === 'none') return;
+    // const lines = this.getColumnAttributes('columnlines');
+    // for (const row of this.childNodes) {
+    //   let i = 0;
+    //   for (const cell of this.adaptor.childNodes(row.chtml).slice(1) as N[]) {
+    //     const line = lines[i++];
+    //     if (line === 'none') continue;
+    //     this.adaptor.setStyle(cell, 'borderLeft', '.07em ' + line);
+    //   }
+    // }
+  }
+
+  /**
+   * Add widths to the cells for the column widths
+   */
+   handleColumnWidths() {
+    return;
+    // for (const row of this.childNodes) {
+    //   let i = 0;
+    //   for (const cell of this.adaptor.childNodes(row.chtml) as N[]) {
+    //     const w = this.cWidths[i++];
+    //     if (w !== null) {
+    //       const width = typeof w === 'number' ? this.em(w) : w;
+    //       this.adaptor.setStyle(cell, 'width', width);
+    //       this.adaptor.setStyle(cell, 'maxWidth', width);
+    //       this.adaptor.setStyle(cell, 'minWidth', width);
+    //     }
+    //   }
+    // }
+  }
+
+  /**
+   * Set the inter-row spacing for all rows
+   *  (Use frame spacing on the outsides, if needed, and use half the row spacing on each
+   *   neighboring row, so that if row lines are needed, they fall in the middle
+   *   of the row space.)
+   */
+   handleRowSpacing() {
+    // const spacing = this.getEmHalfSpacing(this.fSpace[1], this.rSpace);
+    // const frame = this.frame;
+    // //
+    // //  For each row...
+    // //
+    // let i = 0;
+    // for (const row of this.childNodes) {
+    //   //
+    //   //  Get the top and bottom spacing
+    //   //
+    //   const tspace = spacing[i++];
+    //   const bspace = spacing[i];
+    //   //
+    //   //  For each cell in the row...
+    //   //
+    //   for (const cell of row.childNodes) {
+    //     //
+    //     //  Set the style for the spacing, if it is needed, and isn't the
+    //     //  default already set in the mtd styles
+    //     //
+    //     if ((i > 1 && tspace !== '0.215em') || (frame && i === 1)) {
+    //       this.adaptor.setStyle(cell.chtml, 'paddingTop', tspace);
+    //     }
+    //     if (
+    //       (i < this.numRows && bspace !== '0.215em') ||
+    //       (frame && i === this.numRows)
+    //     ) {
+    //       this.adaptor.setStyle(cell.chtml, 'paddingBottom', bspace);
+    //     }
+    //   }
+    // }
+  }
+
+  /**
+   * Add borders to the tops of cells to make the row lines
+   */
+   handleRowLines() {
+    return;
+    // if (this.node.attributes.get('rowlines') === 'none') return;
+    // const lines = this.getRowAttributes('rowlines');
+    // let i = 0;
+    // for (const row of this.childNodes.slice(1)) {
+    //   const line = lines[i++];
+    //   if (line === 'none') continue;
+    //   for (const cell of this.adaptor.childNodes(row.chtml) as N[]) {
+    //     this.adaptor.setStyle(cell, 'borderTop', '.07em ' + line);
+    //   }
+    // }
+  }
+
+  /**
+   * Set the heights of all rows to be the same, and properly center
+   * baseline or axis rows within the newly sized
+   */
+   handleEqualRows() {
+    if (!this.node.attributes.get('equalrows')) return;
+    const space = this.getRowHalfSpacing();
+    const { H, D, NH, ND } = this.getTableData();
+    const HD = this.getEqualRowHeight();
+    //
+    // Loop through the rows and set their heights
+    //
+    for (let i = 0; i < this.numRows; i++) {
+      const row = this.childNodes[i];
+      if (HD !== NH[i] + ND[i]) {
+        this.setRowHeight(
+          row,
+          HD,
+          (HD - H[i] + D[i]) / 2,
+          space[i] + space[i + 1]
+        );
+      }
+    }
+  }
+
+  /**
+   * Set the height of the row, and make sure that the baseline is in the right position for cells
+   *   that are row aligned to baseline ot axis
+   *
+   * @param {CHTMLWrapper} row   The row to be set
+   * @param {number} HD          The total height+depth for the row
+   * @param {number] D           The new depth for the row
+   * @param {number} space       The total spacing above and below the row
+   */
+   setRowHeight(
+    row,
+    HD,
+    D,
+    space
+  ) {
+    this.adaptor.setStyle(row.chtml, 'height', this.em(HD + space));
+    const ralign = row.node.attributes.get('rowalign') ;
+    //
+    //  Loop through the cells and set the strut height and depth.
+    //    The strut is the last element in the cell.
+    //
+    for (const cell of row.childNodes) {
+      if (this.setCellBaseline(cell, ralign, HD, D)) break;
+    }
+  }
+
+  /**
+   * Make sure the baseline is in the correct place for cells aligned on baseline or axis
+   *
+   * @param {CHTMLWrapper} cell  The cell to modify
+   * @param {string} ralign      The alignment of the row
+   * @param {number} HD          The total height+depth for the row
+   * @param {number] D           The new depth for the row
+   * @return {boolean}           True if no other cells in this row need to be processed
+   */
+   setCellBaseline(
+    cell,
+    ralign,
+    HD,
+    D
+  ) {
+    const calign = cell.node.attributes.get('rowalign');
+    if (calign === 'baseline' || calign === 'axis') {
+      const adaptor = this.adaptor;
+      const child = adaptor.lastChild(cell.chtml) ;
+      adaptor.setStyle(child, 'height', this.em(HD));
+      adaptor.setStyle(child, 'verticalAlign', this.em(-D));
+      const row = cell.parent;
+      if (
+        (!row.node.isKind('mlabeledtr') || cell !== row.childNodes[0]) &&
+        (ralign === 'baseline' || ralign === 'axis')
+      ) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  /**
+   * Add a frame to the mtable, if needed
+   */
+   handleFrame() {
+    if (this.frame) {
+      this.adaptor.setStyle(
+        this.itable,
+        'border',
+        '.07em ' + this.node.attributes.get('frame')
+      );
+    }
+  }
+
+  /**
+   * Handle percentage widths and fixed widths
+   */
+   handleWidth() {
+    return;
+    // const adaptor = this.adaptor;
+    // const { w, L, R } = this.getBBox();
+    // adaptor.setStyle(this.chtml, 'minWidth', this.em(L + w + R));
+    // let W = this.node.attributes.get('width') as string;
+    // if (isPercent(W)) {
+    //   adaptor.setStyle(this.chtml, 'width', '');
+    //   adaptor.setAttribute(this.chtml, 'width', 'full');
+    // } else if (!this.hasLabels) {
+    //   if (W === 'auto') return;
+    //   W = this.em(this.length2em(W) + 2 * this.fLine);
+    // }
+    // const table = adaptor.firstChild(this.chtml) as N;
+    // adaptor.setStyle(table, 'width', W);
+    // adaptor.setStyle(table, 'minWidth', this.em(w));
+    // if (L || R) {
+    //   adaptor.setStyle(this.chtml, 'margin', '');
+    //   if (L === R) {
+    //     adaptor.setStyle(table, 'margin', '0 ' + this.em(R));
+    //   } else {
+    //     adaptor.setStyle(
+    //       table,
+    //       'margin',
+    //       '0 ' + this.em(R) + ' 0 ' + this.em(L)
+    //     );
+    //   }
+    // }
+    // adaptor.setAttribute(this.itable, 'width', 'full');
+  }
+
+  /**
+   * Handle alignment of table to surrounding baseline
+   */
+   handleAlign() {
+    const [align, row] = this.getAlignmentRow();
+    if (row === null) {
+      if (align !== 'axis') {
+        this.adaptor.setAttribute(this.chtml, 'align', align);
+      }
+    } else {
+      const y = this.getVerticalPosition(row, align);
+      this.adaptor.setAttribute(this.chtml, 'align', 'top');
+      this.adaptor.setStyle(this.chtml, 'verticalAlign', this.em(y));
+    }
+  }
+
+  /**
+   * Mark the alignment of the table
+   */
+   handleJustify() {
+    const align = this.getAlignShift()[0];
+    if (align !== 'center') {
+      this.adaptor.setAttribute(this.chtml, 'justify', align);
+    }
+  }
+
+  /******************************************************************/
+
+  /**
+   * Handle addition of labels to the table
+   */
+   handleLabels() {
+    if (!this.hasLabels) return;
+    const labels = this.labels;
+    const attributes = this.node.attributes;
+    const adaptor = this.adaptor;
+    //
+    //  Set the side for the labels
+    //
+    const side = attributes.get('side') ;
+    adaptor.setAttribute(this.chtml, 'side', side);
+    adaptor.setAttribute(labels, 'align', side);
+    adaptor.setStyle(labels, side, '0');
+    //
+    //  Make sure labels don't overlap table
+    //
+    const [align, shift] = this.addLabelPadding(side);
+    //
+    //  Handle indentation
+    //
+    if (shift) {
+      const table = adaptor.firstChild(this.chtml) ;
+      this.setIndent(table, align, shift);
+    }
+    //
+    // Add the labels to the table
+    //
+    this.updateRowHeights();
+    this.addLabelSpacing();
+  }
+
+  /**
+   * @param {string} side         The side for the labels
+   * @return {[string, number]}   The alignment and shift values
+   */
+   addLabelPadding(side) {
+    const [, align, shift] = this.getPadAlignShift(side);
+    const styles = {};
+    if (side === 'right') {
+      const W = this.node.attributes.get('width') ;
+      const { w, L, R } = this.getBBox();
+      styles.style = {
+        width: isPercent(W)
+          ? 'calc(' + W + ' + ' + this.em(L + R) + ')'
+          : this.em(L + w + R),
+      };
+    }
+    this.adaptor.append(
+      this.chtml,
+      this.html('mjx-labels', styles, [this.labels])
+    );
+    return [align, shift] ;
+  }
+
+  /**
+   * Update any rows that are not naturally tall enough for the labels,
+   *   and set the baseline for labels that are baseline aligned.
+   */
+   updateRowHeights() {
+    if (this.node.attributes.get('equalrows') ) return;
+    let { H, D, NH, ND } = this.getTableData();
+    const space = this.getRowHalfSpacing();
+    for (let i = 0; i < this.numRows; i++) {
+      const row = this.childNodes[i];
+      if (H[i] !== NH[i] || D[i] !== ND[i]) {
+        this.setRowHeight(row, H[i] + D[i], D[i], space[i] + space[i + 1]);
+      } else if (row.node.isKind('mlabeledtr')) {
+        this.setCellBaseline(row.childNodes[0], '', H[i] + D[i], D[i]);
+      }
+    }
+  }
+
+  /**
+   * Add spacing elements between the label rows to align them with the rest of the table
+   */
+   addLabelSpacing() {
+    const adaptor = this.adaptor;
+    const equal = this.node.attributes.get('equalrows') ;
+    const { H, D } = this.getTableData();
+    const HD = equal ? this.getEqualRowHeight() : 0;
+    const space = this.getRowHalfSpacing();
+    //
+    //  Start with frame size and add in spacing, height and depth,
+    //    and line thickness for each non-labeled row.
+    //
+    let h = this.fLine;
+    let current = adaptor.firstChild(this.labels) ;
+    for (let i = 0; i < this.numRows; i++) {
+      const row = this.childNodes[i];
+      if (row.node.isKind('mlabeledtr')) {
+        h &&
+          adaptor.insert(
+            this.html('mjx-mtr', { style: { height: this.em(h) } }),
+            current
+          );
+        adaptor.setStyle(
+          current,
+          'height',
+          this.em((equal ? HD : H[i] + D[i]) + space[i] + space[i + 1])
+        );
+        current = adaptor.next(current) ;
+        h = this.rLines[i];
+      } else {
+        h +=
+          space[i] + (equal ? HD : H[i] + D[i]) + space[i + 1] + this.rLines[i];
+      }
+    }
+  }
+} CHTMLmstack.__initStatic(); CHTMLmstack.__initStatic2();
+
+const CHTMLWrappers = {
+  [CHTMLmstack.kind]: CHTMLmstack,
   [CHTMLmath.kind]: CHTMLmath,
   [CHTMLmrow.kind]: CHTMLmrow,
   [CHTMLinferredMrow.kind]: CHTMLinferredMrow,
@@ -25829,7 +27815,7 @@ const CHTMLWrappers  = {
   [CHTMLxml.kind]: CHTMLxml,
   [CHTMLTeXAtom.kind]: CHTMLTeXAtom,
   [CHTMLTextNode.kind]: CHTMLTextNode,
-  [CHTMLWrapper.kind]: CHTMLWrapper
+  [CHTMLWrapper.kind]: CHTMLWrapper,
 };
 
 /*****************************************************************/
@@ -25862,7 +27848,7 @@ CommonWrapperFactory
 
 } CHTMLWrapperFactory.__initStatic();
 
-var _class$a;
+var _class$b;
 
 
 
@@ -25902,7 +27888,7 @@ function CommonTeXFontMixin
 
 (Base) {
 
-  return (_class$a = class extends Base {
+  return (_class$b = class extends Base {
 
     /**
      *  Add the extra variants for the TeX fonts
@@ -25949,7 +27935,7 @@ function CommonTeXFontMixin
       return this.getChar('-smallop', n) || this.getChar('-size4', n);
     }
 
-  }, _class$a.__initStatic(), _class$a.__initStatic2(), _class$a.__initStatic3(), _class$a);
+  }, _class$b.__initStatic(), _class$b.__initStatic2(), _class$b.__initStatic3(), _class$b);
 
 }
 
@@ -30673,24 +32659,59 @@ CommonOutputJax {
 } CHTML.__initStatic(); CHTML.__initStatic2(); CHTML.__initStatic3(); CHTML.__initStatic4();
 
 // tslint:disable: quotemark
+
+
+
+
+// customElements.define('mjx-mstack', MStack);
+
 // const mml = new MathML({});
 const handler = RegisterHTMLHandler(browserAdaptor());
 // console.log(mml);
-console.log("handler:", handler);
+console.log('handler:', handler);
 const mmlConfig = {};
 const fontURL = `https://unpkg.com/mathjax-full@latest/ts/output/chtml/fonts/tex-woff-v2`;
 
 // const fontURL = `https://unpkg.com/mathjax-full@${mathjax.version}/ts/output/chtml/fonts/tex-woff-v2`;
 const htmlConfig = { fontURL };
 const compileMath = (doc) => {
+  const chtml = new CHTML(htmlConfig);
+
+  // set a new factory that has mstack
+  chtml.factory = {} ;
+  const inputJax = new MathML(mmlConfig);
+
+  // set custom mml factory that has mstack
+  inputJax.setMmlFactory({} );
   const html = mathjax.document(document, {
-    InputJax: [new MathML(mmlConfig)],
-    OutputJax: new CHTML(htmlConfig),
+    InputJax: [inputJax],
+    OutputJax: chtml,
   });
   // console.log(d);
 
   html.findMath().compile().getMetrics().typeset().updateDocument().clear();
 
+  // const math = `<math xmlns="http://www.w3.org/1998/Math/MathML">
+  //       <mstack charalign="center" stackalign="right">
+  //         <mn>3589</mn>
+  //         <msrow>
+  //           <mo>+</mo>
+  //           <mn>5123</mn>
+  //         </msrow>
+  //         <msline></msline>
+  //         <msrow></msrow>
+  //       </mstack>
+  //     </math>`;
+  // const item = new HTMLMathItem(math, inputJax);
+  // (item as any).root = { setTeXclass: () => {} };
+  // console.log("item:", item);
+
+  // const o = chtml.typeset(item, html);
+  // console.log("o:", o);
+  // const items = html.getH(html.document);
+  // console.log("items:", items);
+  // const out = chtml.typeset(items[0], html);
+  // console.log("out:", out);
   // d.compile();
   // const found = mml.findMath(document);
 

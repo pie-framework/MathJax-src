@@ -21,35 +21,46 @@
  * @author dpvc@mathjax.org (Davide Cervone)
  */
 
-import {WrapperConstructor} from '../common/Wrapper.js';
-import {CHTMLWrapper} from './Wrapper.js';
-import {CHTMLmath} from './Wrappers/math.js';
-import {CHTMLmi} from './Wrappers/mi.js';
-import {CHTMLmo} from './Wrappers/mo.js';
-import {CHTMLmn} from './Wrappers/mn.js';
-import {CHTMLms} from './Wrappers/ms.js';
-import {CHTMLmtext} from './Wrappers/mtext.js';
-import {CHTMLmspace} from './Wrappers/mspace.js';
-import {CHTMLmpadded} from './Wrappers/mpadded.js';
-import {CHTMLmenclose} from './Wrappers/menclose.js';
-import {CHTMLmrow, CHTMLinferredMrow} from './Wrappers/mrow.js';
-import {CHTMLmfenced} from './Wrappers/mfenced.js';
-import {CHTMLmfrac} from './Wrappers/mfrac.js';
-import {CHTMLmsqrt} from './Wrappers/msqrt.js';
-import {CHTMLmroot} from './Wrappers/mroot.js';
-import {CHTMLmsub, CHTMLmsup, CHTMLmsubsup} from './Wrappers/msubsup.js';
-import {CHTMLmover, CHTMLmunder, CHTMLmunderover} from './Wrappers/munderover.js';
-import {CHTMLmmultiscripts} from './Wrappers/mmultiscripts.js';
-import {CHTMLmtable} from './Wrappers/mtable.js';
-import {CHTMLmtr, CHTMLmlabeledtr} from './Wrappers/mtr.js';
-import {CHTMLmtd} from './Wrappers/mtd.js';
-import {CHTMLmaction} from './Wrappers/maction.js';
-import {CHTMLmglyph} from './Wrappers/mglyph.js';
-import {CHTMLsemantics, CHTMLannotation, CHTMLannotationXML, CHTMLxml} from './Wrappers/semantics.js';
-import {CHTMLTeXAtom} from './Wrappers/TeXAtom.js';
-import {CHTMLTextNode} from './Wrappers/TextNode.js';
+import { WrapperConstructor } from '../common/Wrapper.js';
+import { CHTMLWrapper } from './Wrapper.js';
+import { CHTMLmath } from './Wrappers/math.js';
+import { CHTMLmi } from './Wrappers/mi.js';
+import { CHTMLmo } from './Wrappers/mo.js';
+import { CHTMLmn } from './Wrappers/mn.js';
+import { CHTMLms } from './Wrappers/ms.js';
+import { CHTMLmtext } from './Wrappers/mtext.js';
+import { CHTMLmspace } from './Wrappers/mspace.js';
+import { CHTMLmpadded } from './Wrappers/mpadded.js';
+import { CHTMLmenclose } from './Wrappers/menclose.js';
+import { CHTMLmrow, CHTMLinferredMrow } from './Wrappers/mrow.js';
+import { CHTMLmfenced } from './Wrappers/mfenced.js';
+import { CHTMLmfrac } from './Wrappers/mfrac.js';
+import { CHTMLmsqrt } from './Wrappers/msqrt.js';
+import { CHTMLmroot } from './Wrappers/mroot.js';
+import { CHTMLmsub, CHTMLmsup, CHTMLmsubsup } from './Wrappers/msubsup.js';
+import {
+  CHTMLmover,
+  CHTMLmunder,
+  CHTMLmunderover,
+} from './Wrappers/munderover.js';
+import { CHTMLmmultiscripts } from './Wrappers/mmultiscripts.js';
+import { CHTMLmtable } from './Wrappers/mtable.js';
+import { CHTMLmtr, CHTMLmlabeledtr } from './Wrappers/mtr.js';
+import { CHTMLmtd } from './Wrappers/mtd.js';
+import { CHTMLmaction } from './Wrappers/maction.js';
+import { CHTMLmglyph } from './Wrappers/mglyph.js';
+import {
+  CHTMLsemantics,
+  CHTMLannotation,
+  CHTMLannotationXML,
+  CHTMLxml,
+} from './Wrappers/semantics.js';
+import { CHTMLTeXAtom } from './Wrappers/TeXAtom.js';
+import { CHTMLTextNode } from './Wrappers/TextNode.js';
+import { CHTMLmstack } from './Wrappers/mstack.js';
 
-export const CHTMLWrappers: {[kind: string]: WrapperConstructor}  = {
+export const CHTMLWrappers: { [kind: string]: WrapperConstructor } = {
+  [CHTMLmstack.kind]: CHTMLmstack,
   [CHTMLmath.kind]: CHTMLmath,
   [CHTMLmrow.kind]: CHTMLmrow,
   [CHTMLinferredMrow.kind]: CHTMLinferredMrow,
@@ -84,5 +95,5 @@ export const CHTMLWrappers: {[kind: string]: WrapperConstructor}  = {
   [CHTMLxml.kind]: CHTMLxml,
   [CHTMLTeXAtom.kind]: CHTMLTeXAtom,
   [CHTMLTextNode.kind]: CHTMLTextNode,
-  [CHTMLWrapper.kind]: CHTMLWrapper
+  [CHTMLWrapper.kind]: CHTMLWrapper,
 };

@@ -3,3 +3,4 @@ node_modules
 components/src/**/lib
 js
 es5
+.vscode

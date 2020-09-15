@@ -21,15 +21,20 @@
  * @author dpvc@mathjax.org (Davide Cervone)
  */
 
-import {AbstractMathDocument} from '../../core/MathDocument.js';
-import {userOptions, separateOptions, OptionList, expandable} from '../../util/Options.js';
-import {HTMLMathItem} from './HTMLMathItem.js';
-import {HTMLMathList} from './HTMLMathList.js';
-import {HTMLDomStrings} from './HTMLDomStrings.js';
-import {DOMAdaptor} from '../../core/DOMAdaptor.js';
-import {InputJax} from '../../core/InputJax.js';
-import {STATE, ProtoItem, Location} from '../../core/MathItem.js';
-import {StyleList} from '../../util/StyleList.js';
+import { AbstractMathDocument } from "../../core/MathDocument.js";
+import {
+  userOptions,
+  separateOptions,
+  OptionList,
+  expandable,
+} from "../../util/Options.js";
+import { HTMLMathItem } from "./HTMLMathItem.js";
+import { HTMLMathList } from "./HTMLMathList.js";
+import { HTMLDomStrings } from "./HTMLDomStrings.js";
+import { DOMAdaptor } from "../../core/DOMAdaptor.js";
+import { InputJax } from "../../core/InputJax.js";
+import { STATE, ProtoItem, Location } from "../../core/MathItem.js";
+import { StyleList } from "../../util/StyleList.js";
 
 /*****************************************************************/
 /**
@@ -53,11 +58,10 @@ export type HTMLNodeArray<N, T> = [N | T, number][][];
  * @template D  The Document class
  */
 export class HTMLDocument<N, T, D> extends AbstractMathDocument<N, T, D> {
-
   /**
    * The kind of document
    */
-  public static KIND: string = 'HTML';
+  public static KIND: string = "HTML";
 
   /**
    * The default options for HTMLDocument
@@ -66,11 +70,11 @@ export class HTMLDocument<N, T, D> extends AbstractMathDocument<N, T, D> {
     ...AbstractMathDocument.OPTIONS,
     renderActions: expandable({
       ...AbstractMathDocument.OPTIONS.renderActions,
-      styles: [STATE.INSERTED + 1, '', 'updateStyleSheet', false]  // update styles on a rerender() call
+      styles: [STATE.INSERTED + 1, "", "updateStyleSheet", false], // update styles on a rerender() call
     }),
-    MathList: HTMLMathList,           // Use the HTMLMathList for MathLists
-    MathItem: HTMLMathItem,           // Use the HTMLMathItem for MathItem
-    DomStrings: null                  // Use the default DomString parser
+    MathList: HTMLMathList, // Use the HTMLMathList for MathLists
+    MathItem: HTMLMathItem, // Use the HTMLMathItem for MathItem
+    DomStrings: null, // Use the default DomString parser
   };
 
   /**
@@ -88,10 +92,15 @@ export class HTMLDocument<N, T, D> extends AbstractMathDocument<N, T, D> {
    * @constructor
    * @extends {AbstractMathDocument}
    */
-  constructor(document: any, adaptor: DOMAdaptor<N, T, D>, options: OptionList) {
+  constructor(
+    document: any,
+    adaptor: DOMAdaptor<N, T, D>,
+    options: OptionList
+  ) {
     let [html, dom] = separateOptions(options, HTMLDomStrings.OPTIONS);
     super(document, adaptor, html);
-    this.domStrings = this.options['DomStrings'] || new HTMLDomStrings<N, T, D>(dom);
+    this.domStrings =
+      this.options["DomStrings"] || new HTMLDomStrings<N, T, D>(dom);
     this.domStrings.adaptor = adaptor;
     this.styles = [];
   }
@@ -107,16 +116,21 @@ export class HTMLDocument<N, T, D> extends AbstractMathDocument<N, T, D> {
    * @param {HTMLNodeArray} nodes  The list of node lists representing the string array
    * @return {Location}            The Location object for the position of the delimiter in the document
    */
-  protected findPosition(N: number, index: number, delim: string, nodes: HTMLNodeArray<N, T>): Location<N, T> {
+  protected findPosition(
+    N: number,
+    index: number,
+    delim: string,
+    nodes: HTMLNodeArray<N, T>
+  ): Location<N, T> {
     const adaptor = this.adaptor;
     for (const list of nodes[N]) {
       let [node, n] = list;
-      if (index <= n && adaptor.kind(node) === '#text') {
-        return {node: node, n: Math.max(index, 0), delim: delim};
+      if (index <= n && adaptor.kind(node) === "#text") {
+        return { node: node, n: Math.max(index, 0), delim: delim };
       }
       index -= n;
     }
-    return {node: null, n: 0, delim: delim};
+    return { node: null, n: 0, delim: delim };
   }
 
   /**
@@ -128,13 +142,22 @@ export class HTMLDocument<N, T, D> extends AbstractMathDocument<N, T, D> {
    * @param {HTMLNodeArray} nodes  The array of node lists that produced the string array
    * @return {HTMLMathItem}        The MathItem for the given proto item
    */
-  protected mathItem(item: ProtoItem<N, T>, jax: InputJax<N, T, D>,
-                     nodes: HTMLNodeArray<N, T>): HTMLMathItem<N, T, D> {
-                       let math = item.math;
-                       let start = this.findPosition(item.n, item.start.n, item.open, nodes);
-                       let end = this.findPosition(item.n, item.end.n, item.close, nodes);
-                       return new this.options.MathItem(math, jax, item.display, start, end) as HTMLMathItem<N, T, D>;
-                     }
+  protected mathItem(
+    item: ProtoItem<N, T>,
+    jax: InputJax<N, T, D>,
+    nodes: HTMLNodeArray<N, T>
+  ): HTMLMathItem<N, T, D> {
+    let math = item.math;
+    let start = this.findPosition(item.n, item.start.n, item.open, nodes);
+    let end = this.findPosition(item.n, item.end.n, item.close, nodes);
+    return new this.options.MathItem(
+      math,
+      jax,
+      item.display,
+      start,
+      end
+    ) as HTMLMathItem<N, T, D>;
+  }
 
   /**
    * Find math within the document:
@@ -154,13 +177,21 @@ export class HTMLDocument<N, T, D> extends AbstractMathDocument<N, T, D> {
    * @override
    */
   public findMath(options: OptionList) {
-    if (!this.processed.isSet('findMath')) {
+    if (!this.processed.isSet("findMath")) {
       this.adaptor.document = this.document;
-      options = userOptions({elements: this.options.elements || [this.adaptor.body(this.document)]}, options);
-      for (const container of this.adaptor.getElements(options['elements'], this.document)) {
+      options = userOptions(
+        {
+          elements: this.options.elements || [this.adaptor.body(this.document)],
+        },
+        options
+      );
+      for (const container of this.adaptor.getElements(
+        options["elements"],
+        this.document
+      )) {
         let [strings, nodes] = [null, null] as [string[], HTMLNodeArray<N, T>];
         for (const jax of this.inputJax) {
-          let list = new (this.options['MathList'])();
+          let list = new this.options["MathList"]();
           if (jax.processStrings) {
             if (strings === null) {
               [strings, nodes] = this.domStrings.find(container);
@@ -170,15 +201,22 @@ export class HTMLDocument<N, T, D> extends AbstractMathDocument<N, T, D> {
             }
           } else {
             for (const math of jax.findMath(container)) {
-              let item: HTMLMathItem<N, T, D> =
-                new this.options.MathItem(math.math, jax, math.display, math.start, math.end);
+              console.log("math.math", math.math);
+              console.log("math.math", math);
+              let item: HTMLMathItem<N, T, D> = new this.options.MathItem(
+                math.math,
+                jax,
+                math.display,
+                math.start,
+                math.end
+              );
               list.push(item);
             }
           }
           this.math.merge(list);
         }
       }
-      this.processed.set('findMath');
+      this.processed.set("findMath");
     }
     return this;
   }
@@ -187,11 +225,11 @@ export class HTMLDocument<N, T, D> extends AbstractMathDocument<N, T, D> {
    * @override
    */
   public updateDocument() {
-    if (!this.processed.isSet('updateDocument')) {
+    if (!this.processed.isSet("updateDocument")) {
       this.addPageElements();
       this.addStyleSheet();
       super.updateDocument();
-      this.processed.set('updateDocument');
+      this.processed.set("updateDocument");
     }
     return this;
   }
@@ -214,7 +252,7 @@ export class HTMLDocument<N, T, D> extends AbstractMathDocument<N, T, D> {
     const sheet = this.documentStyleSheet();
     if (sheet) {
       const head = this.adaptor.head(this.document);
-      let styles = this.findSheet(head, this.adaptor.getAttribute(sheet, 'id'));
+      let styles = this.findSheet(head, this.adaptor.getAttribute(sheet, "id"));
       if (styles) {
         this.adaptor.replace(sheet, styles);
       } else {
@@ -230,8 +268,8 @@ export class HTMLDocument<N, T, D> extends AbstractMathDocument<N, T, D> {
    */
   protected findSheet(head: N, id: string) {
     if (id) {
-      for (const sheet of this.adaptor.tags(head, 'style')) {
-        if (this.adaptor.getAttribute(sheet, 'id') === id) {
+      for (const sheet of this.adaptor.tags(head, "style")) {
+        if (this.adaptor.getAttribute(sheet, "id") === id) {
           return sheet;
         }
       }
@@ -243,14 +281,14 @@ export class HTMLDocument<N, T, D> extends AbstractMathDocument<N, T, D> {
    * @override
    */
   public removeFromDocument(restore: boolean = false) {
-    if (this.processed.isSet('updateDocument')) {
+    if (this.processed.isSet("updateDocument")) {
       for (const math of this.math) {
         if (math.state() >= STATE.INSERTED) {
           math.state(STATE.TYPESET, restore);
         }
       }
     }
-    this.processed.clear('updateDocument');
+    this.processed.clear("updateDocument");
     return this;
   }
 
@@ -283,5 +321,4 @@ export class HTMLDocument<N, T, D> extends AbstractMathDocument<N, T, D> {
   public getStyles() {
     return this.styles;
   }
-
 }
